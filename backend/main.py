@@ -1,4 +1,4 @@
-# main.py (Final Definitive Version)
+# main.py (Final Stable Version with Corrected Spacing)
 import subprocess
 import uuid
 import os
@@ -26,6 +26,7 @@ def generate_ai_prompt(text: str) -> str:
     example_1 = "Engineered the MVP, an AI agent on n8n, automating resume data extraction via Google Gemini and OCR API's"
     example_2 = "Trained a predictive FinBERT NLP model to predict stock trends from 25,000+ news articles, reaching 73% accuracy"
     example_3 = "Managed the estate vertical solely and was overseeing an annual amenities budget of INR 1M+ for new initiatives"
+    
     return f"""
     You are an expert resume writing assistant for students at a top-tier engineering college like an IIT in India.
     Your task is to take a user-written bullet point and rewrite it to match the high-quality, dense, and metric-driven style of the examples provided.
@@ -42,7 +43,7 @@ def generate_ai_prompt(text: str) -> str:
 
 # --- Pydantic Models ---
 class PersonalDetails(BaseModel): name: str = ""; branch: str = ""; roll_no: str = ""; cpi: str = ""; dob: str = ""; gender: str = ""
-class ScholasticAchievement(BaseModel): percentile: str = ""; exam_name: str = ""; num_candidates: str = ""; year: str = ""
+class ScholasticAchievement(BaseModel): text: str = ""
 class Experience(BaseModel): company: str = ""; role: str = ""; dates: str = ""; points: List[str] = []
 class Project(BaseModel): name: str = ""; subtitle: str = ""; dates: str = ""; points: List[str] = []
 class Responsibility(BaseModel): role: str = ""; organization: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
@@ -60,9 +61,8 @@ def sanitize(text: str) -> str:
     for char, replacement in replacements.items(): text = text.replace(char, replacement)
     return text
 
-# --- FINAL, PERFECTED LaTeX Generation Functions ---
+# --- FINAL, STABLE LaTeX Generation Functions ---
 def generate_personal_details_latex(details: PersonalDetails, logo_path: str) -> str:
-    # This function now perfectly replicates the header from the reference image.
     return f"""
 \\begin{{tabular*}}{{\\textwidth}}{{l@{{\\extracolsep{{\\fill}}}}r}}
     \\raisebox{{-0.25\\height}}{{\\includegraphics[height=1.5cm]{{{logo_path}}}}} &
@@ -87,16 +87,14 @@ def generate_personal_details_latex(details: PersonalDetails, logo_path: str) ->
 """
 
 def generate_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
-    # This function is now corrected to build the text from structured data.
-    items = "".join([f"    \\item\\textls[10]{{Among the top \\textbf{{{sanitize(ach.percentile)}}} percentile in \\textbf{{{sanitize(ach.exam_name)}}} examination out of \\textbf{{{sanitize(ach.num_candidates)}}} million candidates all over India\\hfill{{\\sl \\small [{sanitize(ach.year)}]}}}}\n" for ach in achievements])
+    # This now expects the full text for simplicity and stability
+    items = "".join([f"    \\item {sanitize(ach.text)}\n" for ach in achievements])
     return f"\\begin{{itemize}}[itemsep=-0.8mm,leftmargin=*]\n{items}\\end{{itemize}}"
 
 def generate_experience_latex(experiences: List[Experience]) -> str:
-    # This function has corrected spacing logic.
     latex_string = ""
     for exp in experiences:
-        # Using double braces {{...}} to protect the content of \textls, making it more robust
-        points_latex = "".join([f"    \\item\\textls[5]{{{{{sanitize(point)}}}}}\n" for point in exp.points if point.strip()])
+        points_latex = "".join([f"    \\item {sanitize(point)}\n" for point in exp.points if point.strip()])
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize(exp.company)}}}
 | \\textbf{{\\large   {sanitize(exp.role)}}}
@@ -107,15 +105,15 @@ def generate_experience_latex(experiences: List[Experience]) -> str:
 \\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 """
-    # Add final spacing after the last experience item
+    # Use the simple, robust spacing from your original working code
     if experiences: latex_string += "\\vspace{-6mm}\n"
     return latex_string
 
 def generate_projects_latex(projects: List[Project]) -> str:
     latex_string = ""
     for i, proj in enumerate(projects):
-        if i > 0: latex_string += "\\vspace{-0.5mm}\n"
-        points_latex = "".join([f"    \\item\\textls[5]{{{{{sanitize(point)}}}}}\n" for point in proj.points if point.strip()])
+        if i > 0: latex_string += "\\vspace{-0.5mm}\n" # Add smaller space between projects
+        points_latex = "".join([f"    \\item {sanitize(point)}\n" for point in proj.points if point.strip()])
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize(proj.name)}}}
 \\textit{{| {sanitize(proj.subtitle)} }}
@@ -131,8 +129,8 @@ def generate_projects_latex(projects: List[Project]) -> str:
 def generate_por_latex(pors: List[Responsibility]) -> str:
     latex_string = ""
     for i, por in enumerate(pors):
-        if i > 0: latex_string += "\\vspace{-0.5mm}\n"
-        points_latex = "".join([f"    \\item\\textls[5]{{{{{sanitize(point)}}}}}\n" for point in por.points if point.strip()])
+        if i > 0: latex_string += "\\vspace{-0.5mm}\n" # Add smaller space between PORs
+        points_latex = "".join([f"    \\item {sanitize(point)}\n" for point in por.points if point.strip()])
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize(por.role)}}} | {sanitize(por.organization)} \\hfill{{\\textit{{{sanitize(por.dates)}}}}} 
 \\vspace{{-3mm}}
@@ -147,7 +145,7 @@ def generate_por_latex(pors: List[Responsibility]) -> str:
 
 # --- FastAPI App ---
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "https://resume-generator-chi-eosin.vercel.app" ], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 @app.post("/generate_pdf")
 async def generate_pdf(resume_data: ResumeData):
@@ -171,7 +169,6 @@ async def generate_pdf(resume_data: ResumeData):
         tex_filepath = f"{session_id}.tex"
         with open(tex_filepath, "w", encoding='utf-8') as f: f.write(latex_template)
         
-        # Run pdflatex twice to ensure all references and layouts are correct
         subprocess.run(['pdflatex', f'-output-directory=/app', '-interaction=nonstopmode', tex_filepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process = subprocess.run(['pdflatex', f'-output-directory=/app', '-interaction=nonstopmode', tex_filepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         

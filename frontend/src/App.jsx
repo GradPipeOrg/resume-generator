@@ -23,8 +23,8 @@ const initialData = {
     phone: "", email: "", linkedin: "", github: ""
   },
   scholasticAchievements: [
-    { percentile: "2.15", exam_name: "JEE Advanced", num_candidates: "0.18", year: "2023" },
-    { percentile: "99.05", exam_name: "JEE Main 2023", num_candidates: "1.1", year: "2023" }
+    { text: "Among the top 2.15 percentile in JEE Advanced examination out of 0.18 million candidates all over India\\hfill{\\sl \\small [2023]}" },
+    { text: "Secured 99.05 percentile in JEE Main 2023 examination out of 1.1 million eligible candidates all over India\\hfill{\\sl \\small [2023]}" }
   ],
   professionalExperience: [],
   keyProjects: [],

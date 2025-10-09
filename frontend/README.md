@@ -1,4 +1,39 @@
-# React + Vite
+# Resume Generator Frontend
+
+This is the frontend application for the Resume Generator, built with React and Vite.
+
+## Environment Setup
+
+Before running the application, you need to set up the environment variable for the API base URL.
+
+### Required Environment Variable
+
+Create a `.env` file in the frontend directory with the following content:
+
+```
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+Replace `http://localhost:8000` with your actual backend API URL.
+
+### Development
+
+```bash
+npm install
+npm run dev
+```
+
+### Production Build
+
+```bash
+npm run build
+```
+
+## API Configuration
+
+The application uses the `VITE_API_BASE_URL` environment variable to connect to the backend API. This allows for easy configuration across different environments (development, staging, production).
+
+## React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

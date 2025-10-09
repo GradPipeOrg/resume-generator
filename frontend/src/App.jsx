@@ -38,7 +38,7 @@ function App() {
   const handleGeneratePdf = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post('http://127.0.0.1:8000/generate_pdf', resumeData, { responseType: 'blob' });
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/generate_pdf`, resumeData, { responseType: 'blob' });
       const fileUrl = URL.createObjectURL(response.data);
       setPdfUrl(fileUrl);
     } catch (error) {

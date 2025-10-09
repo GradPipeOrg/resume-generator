@@ -50,7 +50,7 @@ export const ProfessionalExperienceForm = ({ resumeData, setResumeData }) => {
     
     setIsImproving(`${expIndex}-${pointIndex}`);
     try {
-      const response = await axios.post('http://localhost:8000/improve_text', { text: originalText });
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/improve_text`, { text: originalText });
       const { improved_text } = response.data;
       
       const newExperience = [...resumeData.professionalExperience];

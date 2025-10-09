@@ -147,7 +147,7 @@ def generate_por_latex(pors: List[Responsibility]) -> str:
 
 # --- FastAPI App ---
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "https://resume-generator-chi-eosin.vercel.app" ], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 @app.post("/generate_pdf")
 async def generate_pdf(resume_data: ResumeData):

@@ -1,4 +1,5 @@
 // Forcing a fresh build on Vercel
+// Now using the VITE_API_BASE_URL from the .env file
 import { useState } from 'react';
 import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';

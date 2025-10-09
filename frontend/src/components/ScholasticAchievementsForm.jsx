@@ -2,23 +2,23 @@ import { PlusCircle, Trash2 } from 'lucide-react';
 
 export const ScholasticAchievementsForm = ({ resumeData, setResumeData }) => {
   const handleAchievementChange = (e, index) => {
-    const { name, value } = e.target;
-    const newAch = [...resumeData.scholasticAchievements];
-    newAch[index][name] = value;
-    setResumeData(prev => ({ ...prev, scholasticAchievements: newAch }));
+    const { value } = e.target;
+    const newAchievements = [...resumeData.scholasticAchievements];
+    newAchievements[index].text = value;
+    setResumeData(prev => ({ ...prev, scholasticAchievements: newAchievements }));
   };
 
   const addAchievement = () => {
     setResumeData(prev => ({
       ...prev,
-      scholasticAchievements: [...prev.scholasticAchievements, { percentile: "", exam_name: "", num_candidates: "", year: "" }]
+      scholasticAchievements: [...prev.scholasticAchievements, { text: "" }]
     }));
   };
 
   const removeAchievement = (index) => {
-    const newAch = [...resumeData.scholasticAchievements];
-    newAch.splice(index, 1);
-    setResumeData(prev => ({ ...prev, scholasticAchievements: newAch }));
+    const newAchievements = [...resumeData.scholasticAchievements];
+    newAchievements.splice(index, 1);
+    setResumeData(prev => ({ ...prev, scholasticAchievements: newAchievements }));
   };
 
   return (
@@ -28,30 +28,18 @@ export const ScholasticAchievementsForm = ({ resumeData, setResumeData }) => {
         <button type="button" onClick={addAchievement} className="btn-icon"><PlusCircle size={20} /></button>
       </div>
       {resumeData.scholasticAchievements.map((ach, index) => (
-        <div key={index} className="entry-item">
-          <div className="entry-header">
-            <input
-              type="text" name="exam_name" placeholder="Exam Name"
-              value={ach.exam_name} onChange={(e) => handleAchievementChange(e, index)} className="input-style"
-            />
-            <button type="button" onClick={() => removeAchievement(index)} className="btn-icon btn-danger"><Trash2 size={20} /></button>
+        <div key={index} className="point-item">
+          <textarea
+            placeholder="Scholastic Achievement..."
+            value={ach.text}
+            onChange={(e) => handleAchievementChange(e, index)}
+            className="textarea-style"
+          />
+          <div className="point-actions">
+             <button type="button" onClick={() => removeAchievement(index)} className="btn-icon btn-danger btn-small"><Trash2 size={16} /></button>
           </div>
-          <input
-            type="text" name="percentile" placeholder="Percentile / Rank"
-            value={ach.percentile} onChange={(e) => handleAchievementChange(e, index)} className="input-style"
-          />
-          <input
-            type="text" name="num_candidates" placeholder="Number of Candidates"
-            value={ach.num_candidates} onChange={(e) => handleAchievementChange(e, index)} className="input-style"
-          />
-          <input
-            type="text" name="year" placeholder="Year"
-            value={ach.year} onChange={(e) => handleAchievementChange(e, index)} className="input-style"
-          />
         </div>
       ))}
     </div>
   );
 };
-
-

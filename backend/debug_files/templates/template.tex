@@ -1,0 +1,23 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=0.5in}
+\usepackage{hyperref}
+
+\newcommand{\myname}{__NAME__}
+\newcommand{\myemail}{__EMAIL__}
+\newcommand{\myphone}{__PHONE__}
+\newcommand{\mylinkedin}{__LINKEDIN__}
+\newcommand{\mygithub}{__GITHUB__}
+
+\begin{document}
+
+\begin{center}
+    {\Huge \myname} \\ \vspace{2mm}
+    \href{mailto:\myemail}{\myemail} | \myphone | \href{https://\mylinkedin}{\mylinkedin} | \href{https://\mygithub}{\mygithub}
+\end{center}
+
+\section*{Projects}
+__PROJECTS_SECTION__
+
+\end{document}

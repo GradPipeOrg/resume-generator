@@ -1,0 +1,26 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=0.5in}
+\usepackage{hyperref}
+
+\newcommand{\myname}{Muhammad}
+\newcommand{\myemail}{muhammad@iitb.ac.in}
+\newcommand{\myphone}{9876543210}
+\newcommand{\mylinkedin}{linkedin.com/in/muhammad-iitb}
+\newcommand{\mygithub}{github.com/muhammad-iitb}
+
+\begin{document}
+
+\begin{center}
+    {\Huge \myname} \\ \vspace{2mm}
+    \href{mailto:\myemail}{\myemail} | \myphone | \href{https://\mylinkedin}{\mylinkedin} | \href{https://\mygithub}{\mygithub}
+\end{center}
+
+\section*{Projects}
+\begin{itemize}[leftmargin=*]
+  \item Developed a web app to generate LaTeX resumes.
+  \item Used FastAPI for the backend and React for the frontend.
+\end{itemize}
+
+\end{document}

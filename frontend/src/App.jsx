@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { Download } from 'lucide-react';
 import './App.css';
 import { ProfessionalExperienceForm } from './components/ProfessionalExperienceForm';
 import { KeyProjectsForm } from './components/KeyProjectsForm';
@@ -98,6 +99,16 @@ function App() {
       </div>
       <div className="w-1/2 bg-slate-800/50 p-8 flex flex-col items-center">
         <h2 className="text-2xl font-semibold text-white mb-6">Preview</h2>
+        {pdfUrl && (
+          <a
+            href={pdfUrl}
+            download={`${resumeData.personalDetails.name.replace(' ', '_')}_Resume.pdf`}
+            className="mb-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 flex items-center gap-2"
+          >
+            <Download size={20} />
+            Download PDF
+          </a>
+        )}
         {pdfUrl ? (
           <Document file={pdfUrl} onLoadError={(error) => console.error("React-PDF Load Error:", error)}>
             <Page pageNumber={1} />

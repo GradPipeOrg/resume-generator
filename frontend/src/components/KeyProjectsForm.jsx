@@ -66,37 +66,90 @@ export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
   };
 
   return (
-    <div className="form-section">
-      <div className="section-header">
-        <h2>Key Projects</h2>
-        <button type="button" onClick={addProject} className="btn-icon"><PlusCircle size={20} /></button>
+    <div className="bg-slate-800 rounded-xl p-6 mb-6 shadow-2xl">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold text-white">Key Projects</h2>
+        <button 
+          type="button" 
+          onClick={addProject} 
+          className="text-slate-400 hover:text-indigo-400 hover:bg-slate-700 p-2 rounded-lg transition-colors duration-200"
+        >
+          <PlusCircle size={20} />
+        </button>
       </div>
       {resumeData.keyProjects.map((proj, projIndex) => (
-        <div key={projIndex} className="entry-item">
-          <div className="entry-header">
-            <input type="text" name="name" placeholder="Project Name" value={proj.name} onChange={(e) => handleProjectChange(e, projIndex)} className="input-style" />
-            <button type="button" onClick={() => removeProject(projIndex)} className="btn-icon btn-danger"><Trash2 size={20} /></button>
+        <div key={projIndex} className="bg-slate-900/70 p-4 rounded-lg border border-slate-700 space-y-4">
+          <div className="flex justify-between items-center">
+            <input 
+              type="text" 
+              name="name" 
+              placeholder="Project Name" 
+              value={proj.name} 
+              onChange={(e) => handleProjectChange(e, projIndex)} 
+              className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+            />
+            <button 
+              type="button" 
+              onClick={() => removeProject(projIndex)} 
+              className="text-slate-400 hover:text-red-500 transition"
+            >
+              <Trash2 size={20} />
+            </button>
           </div>
-          <input type="text" name="subtitle" placeholder="Subtitle (e.g., Course Project)" value={proj.subtitle} onChange={(e) => handleProjectChange(e, projIndex)} className="input-style" />
-          <input type="text" name="dates" placeholder="Dates" value={proj.dates} onChange={(e) => handleProjectChange(e, projIndex)} className="input-style" />
+          <div className="space-y-3">
+            <input 
+              type="text" 
+              name="subtitle" 
+              placeholder="Subtitle (e.g., Course Project)" 
+              value={proj.subtitle} 
+              onChange={(e) => handleProjectChange(e, projIndex)} 
+              className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+            />
+            <input 
+              type="text" 
+              name="dates" 
+              placeholder="Dates" 
+              value={proj.dates} 
+              onChange={(e) => handleProjectChange(e, projIndex)} 
+              className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+            />
+          </div>
           
-          <h4 className="points-header">Accomplishments</h4>
+          <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Accomplishments</h4>
           {proj.points.map((point, pointIndex) => (
-            <div key={pointIndex} className="point-item">
+            <div key={pointIndex} className="flex items-start gap-3 mb-3">
               <textarea
-                placeholder="Accomplishment..." value={point}
+                placeholder="Accomplishment..." 
+                value={point}
                 onChange={(e) => handlePointChange(e, projIndex, pointIndex)}
-                className="textarea-style"
+                className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 min-h-[80px] resize-y"
               />
-              <div className="point-actions">
-                <button type="button" onClick={() => handleImprovePoint(projIndex, pointIndex)} className="btn-icon btn-ai" disabled={isImproving === `${projIndex}-${pointIndex}`}>
+              <div className="flex flex-col items-center justify-center gap-2">
+                <button 
+                  type="button" 
+                  onClick={() => handleImprovePoint(projIndex, pointIndex)} 
+                  className="text-slate-400 hover:text-violet-400 hover:bg-slate-600 p-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed" 
+                  disabled={isImproving === `${projIndex}-${pointIndex}`}
+                >
                   <Sparkles size={16} />
                 </button>
-                <button type="button" onClick={() => removePoint(projIndex, pointIndex)} className="btn-icon btn-danger btn-small"><Trash2 size={16} /></button>
+                <button 
+                  type="button" 
+                  onClick={() => removePoint(projIndex, pointIndex)} 
+                  className="text-slate-400 hover:text-red-500 hover:bg-slate-600 p-1.5 rounded transition"
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             </div>
           ))}
-          <button type="button" onClick={() => addPoint(projIndex)} className="btn-add-point"><PlusCircle size={16} /> Add Point</button>
+          <button 
+            type="button" 
+            onClick={() => addPoint(projIndex)} 
+            className="text-sm font-semibold text-indigo-400 hover:bg-indigo-500/10 py-2 px-3 rounded-md flex items-center justify-center gap-2 transition-colors duration-200"
+          >
+            <PlusCircle size={16} /> Add Point
+          </button>
         </div>
       ))}
     </div>

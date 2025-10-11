@@ -56,29 +56,31 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <div className="form-container">
-        <h1>Resume Generator</h1>
+    <div className="flex h-screen">
+      <div className="w-1/2 bg-slate-900 p-8 overflow-y-auto space-y-8">
+        <h1 className="text-4xl font-bold tracking-tighter text-white">Resume Generator</h1>
         
-        <div className="form-section">
-            <h2>Select Template</h2>
+        <div className="bg-slate-800 rounded-xl p-6 shadow-2xl">
+            <h2 className="text-2xl font-semibold text-white mb-4">Select Template</h2>
             <select 
                 value={resumeData.template_name}
                 onChange={(e) => setResumeData(prev => ({...prev, template_name: e.target.value}))}
-                className="input-style"
+                className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
             >
                 <option value="one_page.tex">1-Page Tech Resume</option>
             </select>
         </div>
 
-        <div className="form-section">
-            <h2>Personal Details</h2>
-            <input name="name" value={resumeData.personalDetails.name} onChange={handlePersonalChange} placeholder="Name" className="input-style" />
-            <input name="branch" value={resumeData.personalDetails.branch} onChange={handlePersonalChange} placeholder="Branch" className="input-style" />
-            <input name="roll_no" value={resumeData.personalDetails.roll_no} onChange={handlePersonalChange} placeholder="Roll Number" className="input-style" />
-            <input name="cpi" value={resumeData.personalDetails.cpi} onChange={handlePersonalChange} placeholder="CPI" className="input-style" />
-            <input name="dob" value={resumeData.personalDetails.dob} onChange={handlePersonalChange} placeholder="Date of Birth (DD/MM/YYYY)" className="input-style" />
-            <input name="gender" value={resumeData.personalDetails.gender} onChange={handlePersonalChange} placeholder="Gender" className="input-style" />
+        <div className="bg-slate-800 rounded-xl p-6 shadow-2xl">
+            <h2 className="text-2xl font-semibold text-white mb-4">Personal Details</h2>
+            <div className="space-y-3">
+                <input name="name" value={resumeData.personalDetails.name} onChange={handlePersonalChange} placeholder="Name" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
+                <input name="branch" value={resumeData.personalDetails.branch} onChange={handlePersonalChange} placeholder="Branch" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
+                <input name="roll_no" value={resumeData.personalDetails.roll_no} onChange={handlePersonalChange} placeholder="Roll Number" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
+                <input name="cpi" value={resumeData.personalDetails.cpi} onChange={handlePersonalChange} placeholder="CPI" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
+                <input name="dob" value={resumeData.personalDetails.dob} onChange={handlePersonalChange} placeholder="Date of Birth (DD/MM/YYYY)" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
+                <input name="gender" value={resumeData.personalDetails.gender} onChange={handlePersonalChange} placeholder="Gender" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
+            </div>
         </div>
 
         <ProfessionalExperienceForm resumeData={resumeData} setResumeData={setResumeData} />
@@ -86,18 +88,22 @@ function App() {
         <PositionsOfResponsibilityForm resumeData={resumeData} setResumeData={setResumeData} />
         <ScholasticAchievementsForm resumeData={resumeData} setResumeData={setResumeData} />
 
-        <button onClick={handleGeneratePdf} disabled={isLoading} className="generate-button">
+        <button 
+            onClick={handleGeneratePdf} 
+            disabled={isLoading} 
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-[1.02] active:scale-95 shadow-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
+        >
             {isLoading ? 'Generating...' : 'Generate / Refresh Preview'}
         </button>
       </div>
-      <div className="preview-container">
-        <h2>Preview</h2>
+      <div className="w-1/2 bg-slate-800/50 p-8 flex flex-col items-center">
+        <h2 className="text-2xl font-semibold text-white mb-6">Preview</h2>
         {pdfUrl ? (
           <Document file={pdfUrl} onLoadError={(error) => console.error("React-PDF Load Error:", error)}>
             <Page pageNumber={1} />
           </Document>
         ) : (
-          <p>Click the generate button to see your PDF preview.</p>
+          <p className="text-gray-300 text-center">Click the generate button to see your PDF preview.</p>
         )}
       </div>
     </div>

@@ -1,58 +1,8 @@
-.app-container { display: flex; width: 100vw; height: 100vh; font-family: sans-serif; }
-.form-container { width: 50%; padding: 2rem; overflow-y: auto; box-sizing: border-box; }
-.preview-container { width: 50%; background-color: #525659; padding: 1rem; overflow-y: auto; border-left: 1px solid #ccc; display: flex; flex-direction: column; align-items: center; }
-.form-section { margin-bottom: 1.5rem; padding: 1.5rem; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #fcfcfc; }
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-.section-header h2 { margin: 0; }
-.input-style { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
-.textarea-style { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; box-sizing: border-box; min-height: 80px; resize: vertical; }
-.generate-button { width: 100%; padding: 12px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1rem; font-weight: bold; }
-.generate-button:disabled { background-color: #aaa; }
-.react-pdf__Page__canvas { max-width: 100% !important; height: auto !important; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-
-/* Dynamic Entry Styles */
-.entry-item { border: 1px solid #e5e5e5; padding: 1rem; margin-top: 1rem; border-radius: 6px; background-color: #fff; }
-.entry-header { display: flex; justify-content: space-between; align-items: flex-start; }
-.points-header { margin-top: 1rem; margin-bottom: 0.5rem; color: #555; font-size: 0.9rem; }
-.point-item { display: flex; align-items: flex-start; gap: 8px; }
-.point-item .textarea-style { margin-bottom: 4px; }
-
-/* Button Styles */
-.btn-icon { background: none; border: none; cursor: pointer; color: #555; padding: 4px; }
-.btn-icon:hover { color: #000; }
-.btn-danger { color: #d9534f; }
-.btn-danger:hover { color: #c9302c; }
-.btn-small { padding: 0; }
-.btn-add-point { background-color: #f0f8ff; border: 1px dashed #add8e6; color: #007bff; cursor: pointer; padding: 6px 10px; border-radius: 4px; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-.btn-add-point:hover { background-color: #e6f2ff; }
-
-/* Add these to the end of frontend/src/App.css */
-.point-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.point-item .textarea-style {
-  flex-grow: 1;
-  margin-bottom: 4px;
-}
-
-.point-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.btn-ai {
-  color: #8a2be2;
-}
-
-.btn-ai:hover {
-  color: #6a1a9a;
-}
-
-.btn-ai:disabled {
-  color: #ccc;
-  cursor: not-allowed;
+/* PDF-specific styles only - all form styles now handled by Tailwind */
+.react-pdf__Page__canvas { 
+  max-width: 100% !important; 
+  height: auto !important; 
+  border: 1px solid #374151; 
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+  border-radius: 8px;
 }

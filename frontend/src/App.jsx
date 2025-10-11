@@ -4,6 +4,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Download } from 'lucide-react';
+import { Tooltip } from 'react-tooltip';
 import './App.css';
 import { ProfessionalExperienceForm } from './components/ProfessionalExperienceForm';
 import { KeyProjectsForm } from './components/KeyProjectsForm';
@@ -60,6 +61,7 @@ function App() {
     <div className="flex h-screen">
       <div className="w-1/2 bg-slate-900 p-8 overflow-y-auto space-y-8">
         <h1 className="text-4xl font-bold tracking-tighter text-white">Resume Generator</h1>
+        <Tooltip id="main-tooltip" />
         
         <div className="bg-slate-800 rounded-xl p-6 shadow-2xl">
             <h2 className="text-2xl font-semibold text-white mb-4">Select Template</h2>

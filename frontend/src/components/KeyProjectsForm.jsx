@@ -130,6 +130,8 @@ export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
                   onClick={() => handleImprovePoint(projIndex, pointIndex)} 
                   className="text-slate-400 hover:text-violet-400 hover:bg-slate-600 p-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed" 
                   disabled={isImproving === `${projIndex}-${pointIndex}`}
+                  data-tooltip-id="main-tooltip"
+                  data-tooltip-content="Improve with AI"
                 >
                   <Sparkles size={16} />
                 </button>

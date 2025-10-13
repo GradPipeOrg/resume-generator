@@ -5,3 +5,8 @@
 body {
   @apply bg-slate-900 text-slate-200 antialiased;
 }
+
+@keyframes progress-bar {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}

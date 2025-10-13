@@ -2,6 +2,7 @@
 import subprocess
 import uuid
 import os
+import re
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,13 +31,15 @@ def generate_ai_prompt(text: str) -> str:
     return f"""
     You are an expert resume writing assistant for students at a top-tier engineering college like an IIT in India.
     Your task is to take a user-written bullet point and rewrite it to match the high-quality, dense, and metric-driven style of the examples provided.
+
     Follow these rules strictly:
     1. Start with a strong, impressive action verb.
     2. Use the STAR (Situation, Task, Action, Result) method. Focus on quantifiable results.
     3. Keep the tone highly professional and concise.
-    4. Do not use personal pronouns like "I" or "we".
-    5. Do not use any Markdown formatting.
-    6. CRITICAL RULE: The final output must be a single, unbroken line of text.
+    4. CRITICAL RULE 1: The final output must be a single, unbroken line of text between 120 and 140 characters.
+    5. CRITICAL RULE 2: Do not use any Markdown formatting or personal pronouns like "I" or "we".
+
+    Now, take the following user-written text and transform it in the same style as the examples.
     User Text: "{text}"
     Perfect Output:
     """
@@ -50,16 +53,46 @@ class Responsibility(BaseModel): role: str = ""; organization: str = ""; dates: 
 
 class ResumeData(BaseModel):
     template_name: str
+    sectionOrder: List[str]
     personalDetails: PersonalDetails
     scholasticAchievements: List[ScholasticAchievement]
     professionalExperience: List[Experience]
     keyProjects: List[Project]
     positionsOfResponsibility: List[Responsibility]
 
-def sanitize(text: str) -> str:
-    replacements = {'&': r'\&', '%': r'\%', '$': r'\$', '#': r'\#', '_': r'\_', '{': r'\{', '}': r'\}', '[': r'{[}', ']': r'{]}', '~': r'\textasciitilde{}', '^': r'\textasciicircum{}', '\\': r'\textbackslash{}'}
-    for char, replacement in replacements.items(): text = text.replace(char, replacement)
-    return text
+def sanitize_and_format(text: str) -> str:
+    # This function handles both sanitization and Markdown-style bolding.
+    
+    def sanitize_plain_text(s: str) -> str:
+        # The order of replacement is critical. Backslash must be handled first.
+        s = s.replace('\\', r'\textbackslash{}')
+        s = s.replace('&', r'\&')
+        s = s.replace('%', r'\%') # This is the original, correct escape for %
+        s = s.replace('$', r'\$')
+        s = s.replace('#', r'\#')
+        s = s.replace('_', r'\_')
+        s = s.replace('{', r'\{')
+        s = s.replace('}', r'\}')
+        s = s.replace('[', r'{[}')
+        s = s.replace(']', r'{]}')
+        s = s.replace('~', r'\textasciitilde{}')
+        s = s.replace('^', r'\textasciicircum{}')
+        return s
+
+    # Split the string by the bold delimiter (**), keeping the delimiters
+    parts = re.split(r'(\*\*.*?\*\*)', text)
+    
+    processed_parts = []
+    for part in parts:
+        if part.startswith('**') and part.endswith('**'):
+            # This is a bolded part. Extract content, sanitize it, and wrap in \textbf{}
+            content = part[2:-2]
+            processed_parts.append(f"\\textbf{{{sanitize_plain_text(content)}}}")
+        else:
+            # This is a normal part. Just sanitize it.
+            processed_parts.append(sanitize_plain_text(part))
+            
+    return "".join(processed_parts)
 
 # --- FINAL, STABLE LaTeX Generation Functions ---
 def generate_personal_details_latex(details: PersonalDetails, logo_path: str) -> str:
@@ -67,57 +100,71 @@ def generate_personal_details_latex(details: PersonalDetails, logo_path: str) ->
 \\begin{{tabular*}}{{\\textwidth}}{{l@{{\\extracolsep{{\\fill}}}}r}}
     \\raisebox{{-0.25\\height}}{{\\includegraphics[height=1.5cm]{{{logo_path}}}}} &
     \\begin{{tabular}}[b]{{l}}
-        \\textbf{{\\Large {sanitize(details.name)}}} \\\\
-        {sanitize(details.branch)} \\\\
+        \\textbf{{\\Large {sanitize_and_format(details.name)}}} \\\\
+        {sanitize_and_format(details.branch)} \\\\
         Indian Institute of Technology Bombay
     \\end{{tabular}} &
     \\begin{{tabular}}[b]{{l}}
-        \\textbf{{{sanitize(details.roll_no)}}} \\\\
+        \\textbf{{{sanitize_and_format(details.roll_no)}}} \\\\
         B.Tech \\\\
-        Gender: {sanitize(details.gender)} \\\\
-        DOB: {sanitize(details.dob)}
+        Gender: {sanitize_and_format(details.gender)} \\\\
+        DOB: {sanitize_and_format(details.dob)}
     \\end{{tabular}}
 \\end{{tabular*}}
 \\vspace{{2mm}}
 \\begin{{tabular*}}{{\\textwidth}}{{@{{\\extracolsep{{\\fill}}}}lrlr}}
     \\hline
     \\textbf{{Examination}} & \\textbf{{University}} & \\textbf{{Institute}} & \\textbf{{Year}} & \\textbf{{CPI / \%}} \\\\ \\hline
-    Graduation & IIT Bombay & IIT Bombay & 2027 & {sanitize(details.cpi)} \\\\ \\hline
+    Graduation & IIT Bombay & IIT Bombay & 2027 & {sanitize_and_format(details.cpi)} \\\\ \\hline
 \\end{{tabular*}}
 """
 
 def generate_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
-    # This now expects the full text for simplicity and stability
-    items = "".join([f"    \\item {sanitize(ach.text)}\n" for ach in achievements])
-    return f"\\begin{{itemize}}[itemsep=-0.8mm,leftmargin=*]\n{items}\\end{{itemize}}"
+    if not achievements:
+        return ""  # This ensures the section disappears if it's empty
+
+    # This line now correctly calls the existing 'sanitize_and_format' function
+    items = "".join([f"    \\item {sanitize_and_format(ach.text)}\n" for ach in achievements])
+
+    # This code block generates the title, the list, and the correct spacing
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Scholastic Achievements} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    latex_string += f"\\begin{{itemize}}[itemsep=-0.8mm,leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-6mm}\n"
+    
+    return latex_string
 
 def generate_experience_latex(experiences: List[Experience]) -> str:
-    latex_string = ""
+    if not experiences:
+        return ""  # Return an empty string if there are no experiences
+
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Professional Experience} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for exp in experiences:
-        points_latex = "".join([f"    \\item {sanitize(point)}\n" for point in exp.points if point.strip()])
+        points_latex = "".join([f"    \\item \\justify {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
         latex_string += f"""
-\\noindent \\textbf{{\\large {sanitize(exp.company)}}}
-| \\textbf{{\\large   {sanitize(exp.role)}}}
-\\hfill{{\\textit{{{sanitize(exp.dates)}}}}}
+\\noindent \\textbf{{\\large {sanitize_and_format(exp.company)}}}
+| \\textbf{{\\large   {sanitize_and_format(exp.role)}}}
+\\hfill{{\\textit{{{sanitize_and_format(exp.dates)}}}}}
 \\vspace{{-3mm}}
 \\\\ \\rule{{\\textwidth}}{{0.2mm}}
 \\vspace{{-6.2mm}}
 \\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
+\\vspace{{-4mm}}
 """
-    # Use the simple, robust spacing from your original working code
-    if experiences: latex_string += "\\vspace{-6mm}\n"
     return latex_string
 
 def generate_projects_latex(projects: List[Project]) -> str:
-    latex_string = ""
+    if not projects:
+        return "" # Return an empty string if there are no projects
+
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Key Projects} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for i, proj in enumerate(projects):
-        if i > 0: latex_string += "\\vspace{-0.5mm}\n" # Add smaller space between projects
-        points_latex = "".join([f"    \\item {sanitize(point)}\n" for point in proj.points if point.strip()])
+        if i > 0: latex_string += "\\vspace{-0.5mm}\n"
+        points_latex = "".join([f"    \\item \\justify {sanitize_and_format(point)}\n" for point in proj.points if point.strip()])
         latex_string += f"""
-\\noindent \\textbf{{\\large {sanitize(proj.name)}}}
-\\textit{{| {sanitize(proj.subtitle)} }}
-\\hfill{{\\textit{{{sanitize(proj.dates)}}}}}
+\\noindent \\textbf{{\\large {sanitize_and_format(proj.name)}}}
+\\textit{{| {sanitize_and_format(proj.subtitle)} }}
+\\hfill{{\\textit{{{sanitize_and_format(proj.dates)}}}}}
 \\vspace{{-3mm}}
 \\\\ \\rule{{\\textwidth}}{{0.2mm}}
 \\vspace{{-6.2mm}}
@@ -127,16 +174,19 @@ def generate_projects_latex(projects: List[Project]) -> str:
     return latex_string
 
 def generate_por_latex(pors: List[Responsibility]) -> str:
-    latex_string = ""
+    if not pors:
+        return "" # Return an empty string if there are no PORs
+
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Positions of Responsibility} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for i, por in enumerate(pors):
-        if i > 0: latex_string += "\\vspace{-0.5mm}\n" # Add smaller space between PORs
-        points_latex = "".join([f"    \\item {sanitize(point)}\n" for point in por.points if point.strip()])
+        if i > 0: latex_string += "\\vspace{-0.5mm}\n"
+        points_latex = "".join([f"    \\item \\justify {sanitize_and_format(point)}\n" for point in por.points if point.strip()])
         latex_string += f"""
-\\noindent \\textbf{{\\large {sanitize(por.role)}}} | {sanitize(por.organization)} \\hfill{{\\textit{{{sanitize(por.dates)}}}}} 
+\\noindent \\textbf{{\\large {sanitize_and_format(por.role)}}} | {sanitize_and_format(por.organization)} \\hfill{{\\textit{{{sanitize_and_format(por.dates)}}}}} 
 \\vspace{{-3mm}}
 \\\\ \\rule{{\\textwidth}}{{0.2mm}}
 \\vspace{{-1.5mm}}
-\\textit{{{sanitize(por.description)}}}
+\\textit{{{sanitize_and_format(por.description)}}}
 \\vspace{{-1mm}}
 \\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
@@ -159,11 +209,29 @@ async def generate_pdf(resume_data: ResumeData):
         
         with open(template_path, "r", encoding='utf-8') as f: latex_template = f.read()
         
+        # --- NEW DYNAMIC SECTION GENERATION ---
+        # Map section keys to their generator functions
+        section_generators = {
+            "scholasticAchievements": generate_scholastic_latex,
+            "professionalExperience": generate_experience_latex,
+            "keyProjects": generate_projects_latex,
+            "positionsOfResponsibility": generate_por_latex,
+        }
+        
+        dynamic_content = ""
+        # Iterate through the user-defined order from the frontend
+        for section_key in resume_data.sectionOrder:
+            if section_key in section_generators:
+                # Get the corresponding data for that section (e.g., resume_data.professionalExperience)
+                section_data = getattr(resume_data, section_key, [])
+                # Call the generator function for that section
+                section_latex = section_generators[section_key](section_data)
+                if section_latex: # Only add if the section is not empty
+                    dynamic_content += section_latex + "\n"
+
+        # Replace the single placeholder with the dynamically ordered content
         latex_template = latex_template.replace("__PERSONAL_DETAILS_SECTION__", generate_personal_details_latex(resume_data.personalDetails, final_iitb_logo_path))
-        latex_template = latex_template.replace("__SCHOLASTIC_ACHIEVEMENTS_SECTION__", generate_scholastic_latex(resume_data.scholasticAchievements))
-        latex_template = latex_template.replace("__PROFESSIONAL_EXPERIENCE_SECTION__", generate_experience_latex(resume_data.professionalExperience))
-        latex_template = latex_template.replace("__KEY_PROJECTS_SECTION__", generate_projects_latex(resume_data.keyProjects))
-        latex_template = latex_template.replace("__POSITIONS_OF_RESPONSIBILITY_SECTION__", generate_por_latex(resume_data.positionsOfResponsibility))
+        latex_template = latex_template.replace("__DYNAMIC_CONTENT_SECTION__", dynamic_content)
         
         session_id = str(uuid.uuid4())
         tex_filepath = f"{session_id}.tex"

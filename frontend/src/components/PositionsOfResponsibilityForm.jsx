@@ -126,12 +126,25 @@ export const PositionsOfResponsibilityForm = ({ resumeData, setResumeData }) => 
           <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Accomplishments</h4>
           {por.points.map((point, pointIndex) => (
             <div key={pointIndex} className="flex items-start gap-3 mb-3">
-              <textarea
-                placeholder="Accomplishment..." 
-                value={point}
-                onChange={(e) => handlePointChange(e, porIndex, pointIndex)}
-                className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 min-h-[80px] resize-y"
-              />
+              {isImproving === `${porIndex}-${pointIndex}` ? (
+                <div className="w-full bg-slate-700 border-2 border-slate-600 rounded-lg min-h-[80px] flex flex-col justify-center items-center px-4 space-y-2">
+                  <p className="text-slate-400 text-sm font-medium">Enhancing with AI...</p>
+                  <div className="w-full bg-slate-600 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className="bg-indigo-500 h-1.5 rounded-full"
+                      style={{ animation: 'progress-bar 2s ease-out infinite' }}
+                    ></div>
+                  </div>
+                </div>
+              ) : (
+                <textarea
+                  placeholder="Accomplishment..." 
+                  value={point}
+                  onChange={(e) => handlePointChange(e, porIndex, pointIndex)}
+                  className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 min-h-[80px] resize-y"
+                  disabled={!!isImproving}
+                />
+              )}
               <div className="flex flex-col items-center justify-center gap-2">
                 <button 
                   type="button" 

@@ -1,0 +1,20 @@
+Resume - Generator Feedback
+
+1st:
+→ Entity resume upload → improve(with keeping spacing in mind)
+Sub heading (option)
+Ek line mein pointer aana chahiye
+Font size change
+Improve with AI → should generate an end to end one liner
+Option to change position of sections
+Individual word bolding (selective bold)
+Visual spacing change tool (ideal) (complete visual tools like canva)
+Multiple Templates
+A bit more freedom
+Key Initiative (option to add additional italic sub heading within an individual pointer
+
+2nd:
+-Bhai ek to progress save hona chahiye ya warning aana chahiye refresh karne se pehle, galti se refresh ho gaya sare chiz delete ho gaye
+-UI improve karo, jo points improve karne ka button wo pata lagna chahiye iske liye h, and jab click karo to kuch response aana chahiye loading wagera ya kuch accha animation daal sakte ho
+-Aur agar canvas pe hi edit ka option ho to aur better h, thora tough kaam h but fir accha hi jayega
+-Spacing wagera insure karte ho ki nahi, merko laga nahi ki wo spacing ke hisab se regenerate kar raha h, to wo bhi dekh lo kyuki shayad sabse bada headache yahi hota h spacing sahi honi chahiye

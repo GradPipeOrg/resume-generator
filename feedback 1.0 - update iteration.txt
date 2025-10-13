@@ -1,0 +1,27 @@
+### ### The New, Prioritized Roadmap
+
+Based on this analysis, here is a new, strategically-sound roadmap that prioritizes quick wins and stability before tackling high-risk features.
+
+#### **Phase 1: "The Control & Structure Update" (Immediate Priority)**
+*Goal: Rapidly deliver the most-requested control features that are low-risk.*
+
+1.  **Selective Word Bolding:** This is the perfect first step. It's low-effort, low-risk, and delivers immediate, high-impact value.
+2.  **"Key Initiatives" Sub-sections:** This is the next logical step. It's a well-defined feature from the feedback, adds huge value for power users, and is technically safe to implement.
+3.  **Reordering Sections:** We'll finish this phase by giving users structural control over their entire resume.
+
+**Reasoning:** This phase is about building a stable, powerful, and complete *editor*. We are giving users the fundamental controls they need and expect, building their trust and making the product feel robust.
+
+#### **Phase 2: "The Magic & Polish Sprint"**
+*Goal: Dedicate a focused sprint to the highest-risk, highest-reward feature.*
+
+4.  **End-to-End One-Liners (Justification):** We will tackle this feature only after the core editor is stable. We will treat it as a dedicated "sprint" because it will require significant R&D. We'll need to experiment with different techniques on the backend to get it right.
+
+**Reasoning:** By isolating the riskiest feature, we protect our timeline for the core features. We don't want a difficult AI problem to block the release of essential controls like bolding and reordering.
+
+#### **Phase 3: "The Platform Expansion"**
+*Goal: Broaden the app's appeal and improve onboarding with major new features.*
+
+5.  **Multiple Templates:** With a powerful editor, we can now offer different "skins" for the content.
+6.  **Resume Upload & Parser:** This becomes the new "holy grail" feature to work on after the core product is near-perfect.
+
+This roadmap prioritizes delivering maximum user value with minimum risk, building a stable and powerful product first before tackling the high-risk "magic" features. I recommend we start with Phase 1, beginning with **Selective Word Bolding**.

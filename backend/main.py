@@ -31,15 +31,13 @@ def generate_ai_prompt(text: str) -> str:
     return f"""
     You are an expert resume writing assistant for students at a top-tier engineering college like an IIT in India.
     Your task is to take a user-written bullet point and rewrite it to match the high-quality, dense, and metric-driven style of the examples provided.
-
     Follow these rules strictly:
     1. Start with a strong, impressive action verb.
     2. Use the STAR (Situation, Task, Action, Result) method. Focus on quantifiable results.
     3. Keep the tone highly professional and concise.
-    4. CRITICAL RULE 1: The final output must be a single, unbroken line of text between 120 and 140 characters.
-    5. CRITICAL RULE 2: Do not use any Markdown formatting or personal pronouns like "I" or "we".
-
-    Now, take the following user-written text and transform it in the same style as the examples.
+    4. Do not use personal pronouns like "I" or "we".
+    5. Do not use any Markdown formatting.
+    6. CRITICAL RULE: The final output must be a single, unbroken line of text.
     User Text: "{text}"
     Perfect Output:
     """
@@ -139,7 +137,7 @@ def generate_experience_latex(experiences: List[Experience]) -> str:
 
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Professional Experience} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for exp in experiences:
-        points_latex = "".join([f"    \\item \\justify {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize_and_format(exp.company)}}}
 | \\textbf{{\\large   {sanitize_and_format(exp.role)}}}
@@ -160,7 +158,7 @@ def generate_projects_latex(projects: List[Project]) -> str:
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Key Projects} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for i, proj in enumerate(projects):
         if i > 0: latex_string += "\\vspace{-0.5mm}\n"
-        points_latex = "".join([f"    \\item \\justify {sanitize_and_format(point)}\n" for point in proj.points if point.strip()])
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in proj.points if point.strip()])
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize_and_format(proj.name)}}}
 \\textit{{| {sanitize_and_format(proj.subtitle)} }}
@@ -180,7 +178,7 @@ def generate_por_latex(pors: List[Responsibility]) -> str:
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Positions of Responsibility} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for i, por in enumerate(pors):
         if i > 0: latex_string += "\\vspace{-0.5mm}\n"
-        points_latex = "".join([f"    \\item \\justify {sanitize_and_format(point)}\n" for point in por.points if point.strip()])
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in por.points if point.strip()])
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize_and_format(por.role)}}} | {sanitize_and_format(por.organization)} \\hfill{{\\textit{{{sanitize_and_format(por.dates)}}}}} 
 \\vspace{{-3mm}}

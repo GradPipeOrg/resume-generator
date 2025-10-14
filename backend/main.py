@@ -23,23 +23,65 @@ model = genai.GenerativeModel('gemini-2.5-flash')
 class ImproveTextRequest(BaseModel):
     text: str
 
+class AdjustTextRequest(BaseModel):
+    text: str
+
 def generate_ai_prompt(text: str) -> str:
-    example_1 = "Engineered the MVP, an AI agent on n8n, automating resume data extraction via Google Gemini and OCR API's"
-    example_2 = "Trained a predictive FinBERT NLP model to predict stock trends from 25,000+ news articles, reaching 73% accuracy"
-    example_3 = "Managed the estate vertical solely and was overseeing an annual amenities budget of INR 1M+ for new initiatives"
+    # A curated list of "gold standard" examples provided by the user.
+    examples = [
+        "Leading an IIT-B intern team to audit Agentic AI frameworks, automating IB tasks to project a 25% cost reduction",
+        "Authored a VC-grade market analysis defining a 269 Cr obtainable market using the TAM-SAM-SOM framework",
+        "Engineered the MVP, an AI agent on n8n, automating resume data extraction via Google Gemini and OCR API's",
+        "Trained a predictive FinBERT NLP model to predict stock trends from 25,000+ news articles, reaching 73% accuracy",
+        "Architected a scalable AI platform to consolidate analyst insights and eliminating redundant research duplication",
+        "Implemented semantic de-duplication with Sentence Transformers and a custom AI similarity matching engine",
+        "Helped 700+ final-year students in connecting with 250+ alumni mentors via the Placement Mentoring Program",
+        "Managed the estate vertical solely and was overseeing an annual amenities budget of INR 1M+ for new initiatives",
+        "Spearheaded the installation of 20+ lights on hostel grounds while managing a budget of INR 0.1M for the project",
+        "Led the hostel cycle auction, coordinating with the warden and the security office to sell 400+ unclaimed cycles"
+    ]
     
+    # Convert list of examples into a formatted string for the prompt
+    example_string = "\n".join([f"- \"{ex}\"" for ex in examples])
+
     return f"""
     You are an expert resume writing assistant for students at a top-tier engineering college like an IIT in India.
-    Your task is to take a user-written bullet point and rewrite it to match the high-quality, dense, and metric-driven style of the examples provided.
+    Your task is to take a user-written bullet point and rewrite it to match the high-quality, dense, and metric-driven style of the examples provided below.
+
+    --- EXAMPLES OF PERFECT OUTPUT STYLE ---
+    {example_string}
+    --- END OF EXAMPLES ---
+
     Follow these rules strictly:
     1. Start with a strong, impressive action verb.
     2. Use the STAR (Situation, Task, Action, Result) method. Focus on quantifiable results.
     3. Keep the tone highly professional and concise.
-    4. Do not use personal pronouns like "I" or "we".
-    5. Do not use any Markdown formatting.
-    6. CRITICAL RULE: The final output must be a single, unbroken line of text.
+    4. CRITICAL RULE 2: Do not use any Markdown formatting or personal pronouns like "I" or "we".
+    5. CRITICAL RULE 1: The final output must be a single, unbroken line of text strictly between 110 and 135 characters.
+
+    Now, take the following user-written text and transform it in the same style as the examples.
+
     User Text: "{text}"
+    
     Perfect Output:
+    """
+
+def generate_lengthen_prompt(text: str) -> str:
+    return f"""
+    You are a professional copy-editor. Your task is to rewrite the following sentence to be slightly more descriptive and verbose, while retaining its core meaning, metrics, and professional tone. Make it longer.
+
+    Original Text: "{text}"
+    
+    Rewritten, Longer Text:
+    """
+
+def generate_shorten_prompt(text: str) -> str:
+    return f"""
+    You are a professional copy-editor. Your task is to rewrite the following sentence to be more concise and succinct, while retaining its core meaning, metrics, and professional tone. Make it shorter.
+
+    Original Text: "{text}"
+    
+    Rewritten, Shorter Text:
     """
 
 # --- Pydantic Models ---
@@ -250,6 +292,30 @@ async def generate_pdf(resume_data: ResumeData):
     except Exception as e:
         print("--- AN EXCEPTION OCCURRED IN generate_pdf ---"); traceback.print_exc(); print("-------------------------------------------")
         raise HTTPException(status_code=500, detail=f"An internal error occurred: {str(e)}")
+
+@app.post("/lengthen_text")
+async def lengthen_text(request: AdjustTextRequest):
+    try:
+        if not request.text.strip(): raise HTTPException(status_code=400, detail="Text cannot be empty")
+        prompt = generate_lengthen_prompt(request.text)
+        response = model.generate_content(prompt)
+        adjusted_text = response.text.strip().replace('**', '').replace('\n', ' ')
+        return {"adjusted_text": adjusted_text}
+    except Exception as e:
+        print("--- AI LENGthen EXCEPTION ---"); traceback.print_exc(); print("-------------------------")
+        raise HTTPException(status_code=500, detail=f"An error occurred with the AI model: {str(e)}")
+
+@app.post("/shorten_text")
+async def shorten_text(request: AdjustTextRequest):
+    try:
+        if not request.text.strip(): raise HTTPException(status_code=400, detail="Text cannot be empty")
+        prompt = generate_shorten_prompt(request.text)
+        response = model.generate_content(prompt)
+        adjusted_text = response.text.strip().replace('**', '').replace('\n', ' ')
+        return {"adjusted_text": adjusted_text}
+    except Exception as e:
+        print("--- AI SHORTEN EXCEPTION ---"); traceback.print_exc(); print("-------------------------")
+        raise HTTPException(status_code=500, detail=f"An error occurred with the AI model: {str(e)}")
 
 @app.post("/improve_text")
 async def improve_text(request: ImproveTextRequest):

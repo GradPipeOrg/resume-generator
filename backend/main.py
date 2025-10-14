@@ -40,8 +40,6 @@ def generate_ai_prompt(text: str) -> str:
         "Spearheaded the installation of 20+ lights on hostel grounds while managing a budget of INR 0.1M for the project",
         "Led the hostel cycle auction, coordinating with the warden and the security office to sell 400+ unclaimed cycles"
     ]
-    
-    # Convert list of examples into a formatted string for the prompt
     example_string = "\n".join([f"- \"{ex}\"" for ex in examples])
 
     return f"""
@@ -56,32 +54,36 @@ def generate_ai_prompt(text: str) -> str:
     1. Start with a strong, impressive action verb.
     2. Use the STAR (Situation, Task, Action, Result) method. Focus on quantifiable results.
     3. Keep the tone highly professional and concise.
-    4. CRITICAL RULE 2: Do not use any Markdown formatting or personal pronouns like "I" or "we".
-    5. CRITICAL RULE 1: The final output must be a single, unbroken line of text strictly between 110 and 135 characters.
+    4. CRITICAL RULE 1: The final output must be a single, unbroken line of text strictly between 110 and 120 characters.
+    5. CRITICAL RULE 2: Do not use any Markdown formatting or personal pronouns like "I" or "we".
 
     Now, take the following user-written text and transform it in the same style as the examples.
-
     User Text: "{text}"
-    
     Perfect Output:
     """
 
 def generate_lengthen_prompt(text: str) -> str:
     return f"""
-    You are a professional copy-editor. Your task is to rewrite the following sentence to be slightly more descriptive and verbose, while retaining its core meaning, metrics, and professional tone. Make it longer.
+    You are a professional copy-editor. The following resume bullet point is too short to fill the line.
+    Your task is to rewrite it to be longer, specifically aiming for a length between 110 and 120 characters.
+    You must do this by adding relevant professional detail or more descriptive language, without losing the core meaning or metrics.
+    Do not use any Markdown formatting. Your output must be only the rewritten sentence.
 
-    Original Text: "{text}"
+    Original Short Text: "{text}"
     
-    Rewritten, Longer Text:
+    Rewritten, Longer Text (110-120 characters):
     """
 
 def generate_shorten_prompt(text: str) -> str:
     return f"""
-    You are a professional copy-editor. Your task is to rewrite the following sentence to be more concise and succinct, while retaining its core meaning, metrics, and professional tone. Make it shorter.
+    You are a professional copy-editor. The following resume bullet point is too long and wraps to a second line.
+    Your task is to rewrite it to be more concise, specifically aiming for a length between 110 and 120 characters.
+    You must preserve the key metrics and accomplishments.
+    Do not use any Markdown formatting. Your output must be only the rewritten sentence.
 
-    Original Text: "{text}"
+    Original Long Text: "{text}"
     
-    Rewritten, Shorter Text:
+    Rewritten, Shorter Text (110-120 characters):
     """
 
 # --- Pydantic Models ---

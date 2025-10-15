@@ -15,7 +15,7 @@ export const ProfessionalExperienceForm = ({ resumeData, setResumeData }) => {
   const addExperience = () => {
     setResumeData(prev => ({
       ...prev,
-      professionalExperience: [...prev.professionalExperience, { company: "", role: "", dates: "", points: [""] }]
+      professionalExperience: [...prev.professionalExperience, { company: "", role: "", dates: "", description: "", points: [""] }]
     }));
   };
 
@@ -131,6 +131,14 @@ export const ProfessionalExperienceForm = ({ resumeData, setResumeData }) => {
               name="dates" 
               placeholder="Dates" 
               value={exp.dates} 
+              onChange={(e) => handleExperienceChange(e, expIndex)} 
+              className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+            />
+            <input 
+              type="text" 
+              name="description" 
+              placeholder="Short Description (Optional)" 
+              value={exp.description} 
               onChange={(e) => handleExperienceChange(e, expIndex)} 
               className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
             />

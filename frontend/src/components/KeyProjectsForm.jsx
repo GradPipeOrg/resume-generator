@@ -15,7 +15,7 @@ export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
   const addProject = () => {
     setResumeData(prev => ({
       ...prev,
-      keyProjects: [...prev.keyProjects, { name: "", subtitle: "", dates: "", points: [""] }]
+      keyProjects: [...prev.keyProjects, { name: "", subtitle: "", dates: "", description: "", points: [""] }]
     }));
   };
 
@@ -131,6 +131,14 @@ export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
               name="dates" 
               placeholder="Dates" 
               value={proj.dates} 
+              onChange={(e) => handleProjectChange(e, projIndex)} 
+              className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
+            />
+            <input 
+              type="text" 
+              name="description" 
+              placeholder="Short Description (Optional)" 
+              value={proj.description} 
               onChange={(e) => handleProjectChange(e, projIndex)} 
               className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" 
             />

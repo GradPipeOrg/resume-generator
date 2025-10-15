@@ -89,8 +89,8 @@ def generate_shorten_prompt(text: str) -> str:
 # --- Pydantic Models ---
 class PersonalDetails(BaseModel): name: str = ""; branch: str = ""; roll_no: str = ""; cpi: str = ""; dob: str = ""; gender: str = ""
 class ScholasticAchievement(BaseModel): text: str = ""
-class Experience(BaseModel): company: str = ""; role: str = ""; dates: str = ""; points: List[str] = []
-class Project(BaseModel): name: str = ""; subtitle: str = ""; dates: str = ""; points: List[str] = []
+class Experience(BaseModel): company: str = ""; role: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
+class Project(BaseModel): name: str = ""; subtitle: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
 class Responsibility(BaseModel): role: str = ""; organization: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
 
 class ResumeData(BaseModel):
@@ -177,18 +177,18 @@ def generate_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
 
 def generate_experience_latex(experiences: List[Experience]) -> str:
     if not experiences:
-        return ""  # Return an empty string if there are no experiences
-
+        return ""
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Professional Experience} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for exp in experiences:
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
+        description_latex = f"\\vspace{{-1.5mm}}\n\\textit{{{sanitize_and_format(exp.description)}}}\n\\vspace{{-1mm}}" if exp.description else ""
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize_and_format(exp.company)}}}
 | \\textbf{{\\large   {sanitize_and_format(exp.role)}}}
 \\hfill{{\\textit{{{sanitize_and_format(exp.dates)}}}}}
 \\vspace{{-3mm}}
 \\\\ \\rule{{\\textwidth}}{{0.2mm}}
-\\vspace{{-6.2mm}}
+{description_latex}
 \\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 \\vspace{{-4mm}}
@@ -197,19 +197,19 @@ def generate_experience_latex(experiences: List[Experience]) -> str:
 
 def generate_projects_latex(projects: List[Project]) -> str:
     if not projects:
-        return "" # Return an empty string if there are no projects
-
+        return ""
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Key Projects} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for i, proj in enumerate(projects):
         if i > 0: latex_string += "\\vspace{-0.5mm}\n"
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in proj.points if point.strip()])
+        description_latex = f"\\vspace{{-1.5mm}}\n\\textit{{{sanitize_and_format(proj.description)}}}\n\\vspace{{-1mm}}" if proj.description else ""
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize_and_format(proj.name)}}}
 \\textit{{| {sanitize_and_format(proj.subtitle)} }}
 \\hfill{{\\textit{{{sanitize_and_format(proj.dates)}}}}}
 \\vspace{{-3mm}}
 \\\\ \\rule{{\\textwidth}}{{0.2mm}}
-\\vspace{{-6.2mm}}
+{description_latex}
 \\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 """

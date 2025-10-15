@@ -187,7 +187,7 @@ export const ProfessionalExperienceForm = ({ resumeData, setResumeData }) => {
                       data-tooltip-id="main-tooltip"
                       data-tooltip-content="Make Shorter"
                     >
-                      <ChevronsLeftRight size={16} />
+                      <ChevronsRightLeft size={16} />
                     </button>
                     <button 
                       type="button" 
@@ -197,7 +197,7 @@ export const ProfessionalExperienceForm = ({ resumeData, setResumeData }) => {
                       data-tooltip-id="main-tooltip"
                       data-tooltip-content="Make Longer"
                     >
-                      <ChevronsRightLeft size={16} />
+                      <ChevronsLeftRight size={16} />
                     </button>
                   </div>
                   <button 

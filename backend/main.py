@@ -92,6 +92,7 @@ class ScholasticAchievement(BaseModel): text: str = ""
 class Experience(BaseModel): company: str = ""; role: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
 class Project(BaseModel): name: str = ""; subtitle: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
 class Responsibility(BaseModel): role: str = ""; organization: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
+class ExtraCurricular(BaseModel): text: str = ""; date: str = ""
 
 class ResumeData(BaseModel):
     template_name: str
@@ -101,6 +102,7 @@ class ResumeData(BaseModel):
     professionalExperience: List[Experience]
     keyProjects: List[Project]
     positionsOfResponsibility: List[Responsibility]
+    extraCurriculars: List[ExtraCurricular] = []
 
 def sanitize_and_format(text: str) -> str:
     # This function handles both sanitization and Markdown-style bolding.
@@ -235,6 +237,14 @@ def generate_por_latex(pors: List[Responsibility]) -> str:
 """
     return latex_string
 
+def generate_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> str:
+    if not extracurriculars:
+        return ""
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Extracurricular Activities} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    items = "".join([f"    \\item {sanitize_and_format(ec.text)} \\hfill {{\\sl \\small [{sanitize_and_format(ec.date)}]}}\n" for ec in extracurriculars if ec.text.strip()])
+    latex_string += f"\\begin{{itemize}}[itemsep=0mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    return latex_string
+
 # --- FastAPI App ---
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
@@ -258,6 +268,7 @@ async def generate_pdf(resume_data: ResumeData):
             "professionalExperience": generate_experience_latex,
             "keyProjects": generate_projects_latex,
             "positionsOfResponsibility": generate_por_latex,
+            "extraCurriculars": generate_extracurricular_latex,
         }
         
         dynamic_content = ""

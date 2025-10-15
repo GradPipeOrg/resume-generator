@@ -8,6 +8,7 @@ import { ProfessionalExperienceForm } from './components/ProfessionalExperienceF
 import { KeyProjectsForm } from './components/KeyProjectsForm';
 import { PositionsOfResponsibilityForm } from './components/PositionsOfResponsibilityForm';
 import { ScholasticAchievementsForm } from './components/ScholasticAchievementsForm';
+import { ExtraCurricularsForm } from './components/ExtraCurricularsForm';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 
@@ -19,7 +20,8 @@ const initialData = {
   ], 
   professionalExperience: [], 
   keyProjects: [], 
-  positionsOfResponsibility: []
+  positionsOfResponsibility: [],
+  extraCurriculars: []
 };
 
 // Map keys to components and titles
@@ -28,17 +30,34 @@ const sectionComponents = {
     professionalExperience: { Component: ProfessionalExperienceForm, title: "Professional Experience" },
     keyProjects: { Component: KeyProjectsForm, title: "Key Projects" },
     positionsOfResponsibility: { Component: PositionsOfResponsibilityForm, title: "Positions of Responsibility" },
+    extraCurriculars: { Component: ExtraCurricularsForm, title: "Extracurricular Activities" },
 };
 
 function App() {
   const [resumeData, setResumeData] = useState(() => {
     const savedData = localStorage.getItem('resumeData');
-    return savedData ? JSON.parse(savedData) : initialData;
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      // Ensure extraCurriculars field exists in saved data
+      if (!parsedData.extraCurriculars) {
+        parsedData.extraCurriculars = [];
+      }
+      return parsedData;
+    }
+    return initialData;
   });
   
   const [sectionOrder, setSectionOrder] = useState(() => {
     const savedOrder = localStorage.getItem('sectionOrder');
-    return savedOrder ? JSON.parse(savedOrder) : ['scholasticAchievements', 'professionalExperience', 'keyProjects', 'positionsOfResponsibility'];
+    if (savedOrder) {
+      const parsedOrder = JSON.parse(savedOrder);
+      // Ensure extraCurriculars is in the section order
+      if (!parsedOrder.includes('extraCurriculars')) {
+        parsedOrder.push('extraCurriculars');
+      }
+      return parsedOrder;
+    }
+    return ['scholasticAchievements', 'professionalExperience', 'keyProjects', 'positionsOfResponsibility', 'extraCurriculars'];
   });
 
   const [pdfUrl, setPdfUrl] = useState(null);
@@ -132,7 +151,14 @@ function App() {
                   <ArrowDown size={16} />
                 </button>
               </div>
-              <Component resumeData={resumeData} setResumeData={setResumeData} />
+              <Component 
+                resumeData={resumeData} 
+                setResumeData={setResumeData} 
+                index={index}
+                moveSection={moveSection}
+                isFirst={index === 0}
+                isLast={index === sectionOrder.length - 1}
+              />
             </div>
           );
         })}

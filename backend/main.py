@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import google.generativeai as genai
 from dotenv import load_dotenv
 import traceback
@@ -87,7 +87,20 @@ def generate_shorten_prompt(text: str) -> str:
     """
 
 # --- Pydantic Models ---
-class PersonalDetails(BaseModel): name: str = ""; branch: str = ""; roll_no: str = ""; cpi: str = ""; dob: str = ""; gender: str = ""
+class PersonalDetails(BaseModel):
+    name: str = ""
+    branch: str = ""
+    institution: str = ""
+    email: Optional[str] = ""
+    phone: Optional[str] = ""
+    linkedin_url: Optional[str] = ""
+    github_url: Optional[str] = ""
+    location: Optional[str] = ""
+    cpi: str = ""
+    grad_year: Optional[str] = ""
+    roll_no: Optional[str] = ""
+    dob: Optional[str] = ""
+    gender: Optional[str] = ""
 class ScholasticAchievement(BaseModel): text: str = ""
 class Experience(BaseModel): company: str = ""; role: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
 class Project(BaseModel): name: str = ""; subtitle: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
@@ -139,15 +152,21 @@ def sanitize_and_format(text: str) -> str:
     return "".join(processed_parts)
 
 # --- FINAL, STABLE LaTeX Generation Functions ---
-def generate_personal_details_latex(details: PersonalDetails, logo_path: str) -> str:
+def generate_iitb_header_latex(details: PersonalDetails) -> str:
+    # This function now perfectly replicates the structured IITB header with the logo.
     return f"""
-\\begin{{tabular*}}{{\\textwidth}}{{l@{{\\extracolsep{{\\fill}}}}r}}
-    \\raisebox{{-0.25\\height}}{{\\includegraphics[height=1.5cm]{{{logo_path}}}}} &
+\\begin{{tabular*}}{{\\textwidth}}{{l@{{\\extracolsep{{\\fill}}}}cr}}
+    % Column 1: IITB Logo (larger and left-aligned)
     \\begin{{tabular}}[b]{{l}}
+        \\hspace*{{-14.11mm}}\\includegraphics[height=1.8cm]{{iitb_logo.png}}
+    \\end{{tabular}} &
+    % Column 2: Name and Institution (Center Aligned)
+    \\begin{{tabular}}[b]{{c}}
         \\textbf{{\\Large {sanitize_and_format(details.name)}}} \\\\
         {sanitize_and_format(details.branch)} \\\\
-        Indian Institute of Technology Bombay
+        {sanitize_and_format(details.institution)}
     \\end{{tabular}} &
+    % Column 3: Key Stats (Right Aligned)
     \\begin{{tabular}}[b]{{l}}
         \\textbf{{{sanitize_and_format(details.roll_no)}}} \\\\
         B.Tech \\\\
@@ -156,11 +175,51 @@ def generate_personal_details_latex(details: PersonalDetails, logo_path: str) ->
     \\end{{tabular}}
 \\end{{tabular*}}
 \\vspace{{2mm}}
-\\begin{{tabular*}}{{\\textwidth}}{{@{{\\extracolsep{{\\fill}}}}lrlr}}
+\\begin{{tabular*}}{{\\textwidth}}{{@{{\\extracolsep{{\\fill}}}}lcrr}}
     \\hline
-    \\textbf{{Examination}} & \\textbf{{University}} & \\textbf{{Institute}} & \\textbf{{Year}} & \\textbf{{CPI / \%}} \\\\ \\hline
-    Graduation & IIT Bombay & IIT Bombay & 2027 & {sanitize_and_format(details.cpi)} \\\\ \\hline
+    \\textbf{{Examination}} & \\textbf{{Institute}} & \\textbf{{Year}} & \\textbf{{CPI / \\%}} \\\\ \\hline
+    Graduation & {sanitize_and_format(details.institution)} & 2027 & {sanitize_and_format(details.cpi)} \\\\ \\hline
 \\end{{tabular*}}
+"""
+
+def generate_universal_header_latex(details: PersonalDetails) -> str:
+    # This function creates the final, multi-column header using minipages for perfect alignment.
+    
+    contact_parts = []
+    if details.email:
+        contact_parts.append(f"\\faEnvelope \\hspace{{1mm}} \\href{{mailto:{details.email}}}{{{sanitize_and_format(details.email)}}}")
+    if details.phone:
+        contact_parts.append(f"\\faPhone \\hspace{{1mm}} {sanitize_and_format(details.phone)}")
+    if details.linkedin_url:
+        contact_parts.append(f"\\faLinkedin \\hspace{{1mm}} \\href{{{details.linkedin_url}}}{{LinkedIn}}")
+    if details.github_url:
+        contact_parts.append(f"\\faGithub \\hspace{{1mm}} \\href{{{details.github_url}}}{{GitHub}}")
+        
+    contact_block = " \\\\ \n".join(contact_parts)
+
+    return f"""
+% Using minipages for a robust 3-column layout
+\\begin{{minipage}}[t]{{0.3\\textwidth}}
+    \\raggedright
+    {contact_block}
+\\end{{minipage}}%
+\\begin{{minipage}}[t]{{0.4\\textwidth}}
+    \\centering
+    \\vspace*{{2mm}} % Artificially lower the center block for visual balance
+    \\textbf{{\\LARGE \\textcolor{{Blue}}{{{sanitize_and_format(details.name)}}}}} \\\\
+    \\normalsize {sanitize_and_format(details.branch)} \\\\
+    \\normalsize {sanitize_and_format(details.institution)}
+\\end{{minipage}}%
+\\begin{{minipage}}[t]{{0.3\\textwidth}}
+    \\raggedleft
+    \\textbf{{CPI:}} {sanitize_and_format(details.cpi)} \\\\
+    \\textbf{{Graduation:}} {sanitize_and_format(details.grad_year)} \\\\
+    \\textbf{{Location:}} {sanitize_and_format(details.location)}
+\\end{{minipage}}
+
+\\vspace{{4mm}}
+\\rule{{\\textwidth}}{{0.4pt}}
+\\vspace{{-2mm}}
 """
 
 def generate_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
@@ -251,8 +310,6 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 
 @app.post("/generate_pdf")
 async def generate_pdf(resume_data: ResumeData):
-    iitb_logo_path = "iitb_logo.png"
-    final_iitb_logo_path = os.path.join("/app", iitb_logo_path).replace("\\", "/")
     try:
         template_filename = resume_data.template_name
         if '..' in template_filename: raise HTTPException(status_code=400, detail="Invalid template name")
@@ -282,8 +339,13 @@ async def generate_pdf(resume_data: ResumeData):
                 if section_latex: # Only add if the section is not empty
                     dynamic_content += section_latex + "\n"
 
-        # Replace the single placeholder with the dynamically ordered content
-        latex_template = latex_template.replace("__PERSONAL_DETAILS_SECTION__", generate_personal_details_latex(resume_data.personalDetails, final_iitb_logo_path))
+        # --- Smart Header Generation ---
+        if "iitb" in resume_data.template_name.lower():
+            header_latex = generate_iitb_header_latex(resume_data.personalDetails)
+        else:
+            header_latex = generate_universal_header_latex(resume_data.personalDetails)
+        
+        latex_template = latex_template.replace("__PERSONAL_DETAILS_SECTION__", header_latex)
         latex_template = latex_template.replace("__DYNAMIC_CONTENT_SECTION__", dynamic_content)
         
         session_id = str(uuid.uuid4())

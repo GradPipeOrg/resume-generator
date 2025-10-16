@@ -12,15 +12,41 @@ import { ExtraCurricularsForm } from './components/ExtraCurricularsForm';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 
+// --- Template Configuration ---
+const templates = {
+  'universal_one_page.tex': {
+    name: '1-Page Universal',
+    headerFields: ['name', 'branch', 'institution', 'cpi', 'grad_year', 'location', 'email', 'phone', 'linkedin_url', 'github_url']
+  },
+  'iitb_one_page.tex': {
+    name: '1-Page IITB Style',
+    headerFields: ['name', 'branch', 'roll_no', 'cpi', 'dob', 'gender']
+  }
+};
+
 const initialData = {
-  personalDetails: { name: "Mohammad Shabir Peerzada", branch: "Civil Engineering", roll_no: "23B0717", cpi: "8.64", dob: "26/05/2004", gender: "Male", phone: "", email: "", linkedin: "", github: "" },
+  personalDetails: { 
+    name: "Mohammad Shabir Peerzada", 
+    branch: "Civil Engineering", 
+    institution: "Indian Institute of Technology Bombay", 
+    email: "your.email@example.com", 
+    phone: "+91 12345 67890", 
+    linkedin_url: "https://www.linkedin.com/in/yourprofile", 
+    github_url: "https://github.com/yourprofile", 
+    location: "Srinagar, India", 
+    cpi: "8.64", 
+    grad_year: "2027", 
+    roll_no: "23B0717", 
+    dob: "26/05/2004", 
+    gender: "Male" 
+  },
   scholasticAchievements: [
     { text: "Among the top 2.15 percentile in JEE Advanced examination out of 0.18 million candidates all over India[2023]" },
     { text: "Secured 99.05 percentile in JEE Main 2023 examination out of 1.1 million eligible candidates all over India[2023]" }
   ], 
   professionalExperience: [], 
   keyProjects: [], 
-  positionsOfResponsibility: [],
+  positionsOfResponsibility: [], 
   extraCurriculars: []
 };
 
@@ -34,6 +60,7 @@ const sectionComponents = {
 };
 
 function App() {
+  const [template, setTemplate] = useState('universal_one_page.tex');
   const [resumeData, setResumeData] = useState(() => {
     const savedData = localStorage.getItem('resumeData');
     if (savedData) {
@@ -82,7 +109,7 @@ function App() {
   const handleGeneratePdf = async () => {
     setIsLoading(true);
     // Include sectionOrder in the payload
-    const payload = { ...resumeData, sectionOrder, template_name: 'one_page.tex' };
+    const payload = { ...resumeData, sectionOrder, template_name: template };
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/generate_pdf`, payload, { responseType: 'blob' });
       const fileUrl = URL.createObjectURL(response.data);
@@ -100,6 +127,10 @@ function App() {
     setResumeData(prev => ({...prev, personalDetails: {...prev.personalDetails, [name]: value}}));
   }
 
+  const handleTemplateChange = (e) => {
+    setTemplate(e.target.value);
+  };
+
   const moveSection = (index, direction) => {
     const newOrder = [...sectionOrder];
     const newIndex = index + direction;
@@ -114,28 +145,34 @@ function App() {
         <h1 className="text-4xl font-bold tracking-tighter text-white">Resume Generator</h1>
         <Tooltip id="main-tooltip" />
         
-        {/* Static sections like Template and Personal Details */}
         <div className="bg-slate-800 rounded-xl p-6 shadow-2xl">
-            <h2 className="text-2xl font-semibold text-white mb-4">Select Template</h2>
-            <select 
-                value={resumeData.template_name || 'one_page.tex'}
-                onChange={(e) => setResumeData(prev => ({...prev, template_name: e.target.value}))}
-                className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-            >
-                <option value="one_page.tex">1-Page Tech Resume</option>
-            </select>
+          <h2 className="text-2xl font-semibold text-white mb-4">Select Template</h2>
+          <select value={template} onChange={handleTemplateChange} className="input-style">
+            {Object.entries(templates).map(([fileName, { name }]) => (
+              <option key={fileName} value={fileName}>{name}</option>
+            ))}
+          </select>
         </div>
 
         <div className="bg-slate-800 rounded-xl p-6 shadow-2xl">
-            <h2 className="text-2xl font-semibold text-white mb-4">Personal Details</h2>
-            <div className="space-y-3">
-                <input name="name" value={resumeData.personalDetails.name} onChange={handlePersonalChange} placeholder="Name" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
-                <input name="branch" value={resumeData.personalDetails.branch} onChange={handlePersonalChange} placeholder="Branch" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
-                <input name="roll_no" value={resumeData.personalDetails.roll_no} onChange={handlePersonalChange} placeholder="Roll Number" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
-                <input name="cpi" value={resumeData.personalDetails.cpi} onChange={handlePersonalChange} placeholder="CPI" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
-                <input name="dob" value={resumeData.personalDetails.dob} onChange={handlePersonalChange} placeholder="Date of Birth (DD/MM/YYYY)" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
-                <input name="gender" value={resumeData.personalDetails.gender} onChange={handlePersonalChange} placeholder="Gender" className="w-full bg-slate-700 border-2 border-slate-600 text-slate-100 rounded-lg p-3 text-base placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" />
-            </div>
+          <h2 className="text-2xl font-semibold text-white mb-4">Personal Details</h2>
+          <div className="space-y-3">
+            {/* --- NEW DYNAMIC FORM --- */}
+            {templates[template].headerFields.map((fieldName) => {
+                // Simple title generation from fieldName
+                const placeholder = fieldName.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                return (
+                    <input
+                        key={fieldName}
+                        name={fieldName}
+                        value={resumeData.personalDetails[fieldName] || ''}
+                        onChange={handlePersonalChange}
+                        placeholder={placeholder}
+                        className="input-style"
+                    />
+                );
+            })}
+          </div>
         </div>
 
         {/* Dynamically Ordered Sections */}

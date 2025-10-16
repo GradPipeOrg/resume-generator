@@ -182,6 +182,40 @@ def generate_iitb_header_latex(details: PersonalDetails) -> str:
 \\end{{tabular*}}
 """
 
+def generate_personal_details_latex(details: PersonalDetails) -> str:
+    # This function creates the final, multi-column header using minipages for perfect alignment.
+    contact_parts = []
+    if details.email:
+        contact_parts.append(f"\\faEnvelope \\hspace{{1mm}} \\href{{mailto:{details.email}}}{{{sanitize_and_format(details.email)}}}")
+    if details.phone:
+        contact_parts.append(f"\\faPhone \\hspace{{1mm}} {sanitize_and_format(details.phone)}")
+    if details.linkedin_url:
+        contact_parts.append(f"\\faLinkedin \\hspace{{1mm}} \\href{{{details.linkedin_url}}}{{LinkedIn}}")
+    if details.github_url:
+        contact_parts.append(f"\\faGithub \\hspace{{1mm}} \\href{{{details.github_url}}}{{GitHub}}")
+    contact_block = " \\\\ \n".join(contact_parts)
+    return f"""
+\\begin{{minipage}}[t]{{0.3\\textwidth}}
+    \\raggedright
+    {contact_block}
+\\end{{minipage}}%
+\\begin{{minipage}}[t]{{0.4\\textwidth}}
+    \\centering
+    \\vspace*{{2mm}}
+    \\textbf{{\\LARGE \\textcolor{{Blue}}{{{sanitize_and_format(details.name)}}}}} \\\\
+    \\normalsize {sanitize_and_format(details.branch)} \\\\
+    \\normalsize {sanitize_and_format(details.institution)}
+\\end{{minipage}}%
+\\begin{{minipage}}[t]{{0.3\\textwidth}}
+    \\raggedleft
+    \\textbf{{CPI:}} {sanitize_and_format(details.cpi)} \\\\
+    \\textbf{{Graduation:}} {sanitize_and_format(details.grad_year)} \\\\
+    \\textbf{{Location:}} {sanitize_and_format(details.location)}
+\\end{{minipage}}
+\\vspace{{4mm}}
+\\rule{{\\textwidth}}{{0.4pt}}
+"""
+
 def generate_universal_header_latex(details: PersonalDetails) -> str:
     # This function creates the final, multi-column header using minipages for perfect alignment.
     
@@ -223,24 +257,18 @@ def generate_universal_header_latex(details: PersonalDetails) -> str:
 """
 
 def generate_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
-    if not achievements:
-        return ""  # This ensures the section disappears if it's empty
-
-    # This line now correctly calls the existing 'sanitize_and_format' function
-    items = "".join([f"    \\item {sanitize_and_format(ach.text)}\n" for ach in achievements])
-
-    # This code block generates the title, the list, and the correct spacing
+    if not achievements: return ""
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Scholastic Achievements} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    items = "".join([f"    \\item {sanitize_and_format(ach.text)}\n" for ach in achievements])
     latex_string += f"\\begin{{itemize}}[itemsep=-0.8mm,leftmargin=*]\n{items}\\end{{itemize}}\n"
     latex_string += "\\vspace{-6mm}\n"
-    
     return latex_string
 
 def generate_experience_latex(experiences: List[Experience]) -> str:
-    if not experiences:
-        return ""
+    if not experiences: return ""
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Professional Experience} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
-    for exp in experiences:
+    for i, exp in enumerate(experiences):
+        if i > 0: latex_string += "\\vspace{1mm}\n" # Add a small space BETWEEN experiences
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
         description_latex = f"\\vspace{{-1.5mm}}\n\\textit{{{sanitize_and_format(exp.description)}}}\n\\vspace{{-1mm}}" if exp.description else ""
         latex_string += f"""
@@ -252,13 +280,12 @@ def generate_experience_latex(experiences: List[Experience]) -> str:
 {description_latex}
 \\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
-\\vspace{{-4mm}}
 """
+    if experiences: latex_string += "\\vspace{-6mm}\n" # Add final space after the whole section
     return latex_string
 
 def generate_projects_latex(projects: List[Project]) -> str:
-    if not projects:
-        return ""
+    if not projects: return ""
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Key Projects} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for i, proj in enumerate(projects):
         if i > 0: latex_string += "\\vspace{-0.5mm}\n"
@@ -274,12 +301,11 @@ def generate_projects_latex(projects: List[Project]) -> str:
 \\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 """
+    if projects: latex_string += "\\vspace{-6mm}\n"
     return latex_string
 
 def generate_por_latex(pors: List[Responsibility]) -> str:
-    if not pors:
-        return "" # Return an empty string if there are no PORs
-
+    if not pors: return ""
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Positions of Responsibility} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     for i, por in enumerate(pors):
         if i > 0: latex_string += "\\vspace{-0.5mm}\n"
@@ -294,12 +320,12 @@ def generate_por_latex(pors: List[Responsibility]) -> str:
 \\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 """
+    if pors: latex_string += "\\vspace{-6mm}\n"
     return latex_string
 
 def generate_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> str:
-    if not extracurriculars:
-        return ""
-    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Extracurricular Activities} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    if not extracurriculars: return ""
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Extra-Curricular Activities} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
     items = "".join([f"    \\item {sanitize_and_format(ec.text)} \\hfill {{\\sl \\small [{sanitize_and_format(ec.date)}]}}\n" for ec in extracurriculars if ec.text.strip()])
     latex_string += f"\\begin{{itemize}}[itemsep=0mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
     return latex_string

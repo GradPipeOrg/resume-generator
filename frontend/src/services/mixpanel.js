@@ -21,6 +21,9 @@ if (mixpanelToken) {
 
 export const trackEvent = (eventName, properties = {}) => {
   if (mixpanelToken) {
+    console.log(`[Mixpanel] Firing event: "${eventName}"`, properties); // <-- ADD THIS LINE
     mixpanel.track(eventName, properties);
+  } else {
+    console.log('[Mixpanel] Token not found. Analytics are disabled.'); // <-- ADD THIS LINE
   }
 };

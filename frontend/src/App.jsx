@@ -29,23 +29,23 @@ const templates = {
 
 const initialData = {
   personalDetails: { 
-    name: "Mohammad Shabir Peerzada", 
-    branch: "Civil Engineering", 
+    name: "Adolf Hitler", 
+    branch: "Politics", 
     institution: "Indian Institute of Technology Bombay", 
-    email: "your.email@example.com", 
-    phone: "+91 12345 67890", 
-    linkedin_url: "https://www.linkedin.com/in/yourprofile", 
-    github_url: "https://github.com/yourprofile", 
-    location: "Srinagar, India", 
-    cpi: "8.64", 
-    grad_year: "2027", 
-    roll_no: "23B0717", 
-    dob: "26/05/2004", 
+    email: "hitler@nazi.de", 
+    phone: "+49 12345 67890", 
+    linkedin_url: "https://www.linkedin.com/in/adolf-hitler-1900", 
+    github_url: "https://github.com/adolf-hitler-1900", 
+    location: "Berlin, Germany", 
+    cpi: "6 Million", 
+    grad_year: "1945", 
+    roll_no: "4567890", 
+    dob: "20/04/1900", 
     gender: "Male" 
   },
   scholasticAchievements: [
-    { text: "Among the top 2.15 percentile in JEE Advanced examination out of 0.18 million candidates all over India[2023]" },
-    { text: "Secured 99.05 percentile in JEE Main 2023 examination out of 1.1 million eligible candidates all over India[2023]" }
+    { text: "Won the 1933 election for the Chancellor of Germany" },
+    { text: "Won the 1936 election for the Chancellor of Germany" }
   ], 
   professionalExperience: [], 
   keyProjects: [], 

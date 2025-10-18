@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Download, ArrowUp, ArrowDown } from 'lucide-react';
+import { Download, ArrowUp, ArrowDown, HelpCircle } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import 'react-responsive-modal/styles.css'; // Import modal styles
 import { Modal } from 'react-responsive-modal';
@@ -12,6 +12,7 @@ import { KeyProjectsForm } from './components/KeyProjectsForm';
 import { PositionsOfResponsibilityForm } from './components/PositionsOfResponsibilityForm';
 import { ScholasticAchievementsForm } from './components/ScholasticAchievementsForm';
 import { ExtraCurricularsForm } from './components/ExtraCurricularsForm';
+import { Tour } from './components/Tour';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 
@@ -47,7 +48,9 @@ const initialData = {
     { text: "Won the 1933 election for the Chancellor of Germany" },
     { text: "Won the 1936 election for the Chancellor of Germany" }
   ], 
-  professionalExperience: [], 
+  professionalExperience: [
+    { company: "", role: "", dates: "", description: "", points: [""] }
+  ], 
   keyProjects: [], 
   positionsOfResponsibility: [], 
   extraCurriculars: []
@@ -95,6 +98,7 @@ function App() {
   
   // --- NEW STATE FOR MODAL ---
   const [openModal, setOpenModal] = useState(false);
+  const [runTour, setRunTour] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('resumeData', JSON.stringify(resumeData));
@@ -171,10 +175,16 @@ function App() {
   return (
     <div className="flex h-screen">
       <div className="w-1/2 bg-slate-900 p-8 overflow-y-auto space-y-8">
-        <h1 className="text-4xl font-bold tracking-tighter text-white">Resume Generator</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold tracking-tighter text-white">Resume Generator</h1>
+          <button onClick={() => setRunTour(true)} className="flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition" data-tooltip-id="main-tooltip" data-tooltip-content="Start Tour">
+            <HelpCircle size={20} />
+            <span>How to Use</span>
+          </button>
+        </div>
         <Tooltip id="main-tooltip" />
         
-        <div className="bg-slate-800 rounded-xl p-6 shadow-2xl">
+        <div className="bg-slate-800 rounded-xl p-6 shadow-2xl" id="template-selector">
           <h2 className="text-2xl font-semibold text-white mb-4">Select Template</h2>
           <select value={template} onChange={handleTemplateChange} className="input-style">
             {Object.entries(templates).map(([fileName, { name }]) => (
@@ -183,7 +193,7 @@ function App() {
           </select>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 shadow-2xl">
+        <div className="bg-slate-800 rounded-xl p-6 shadow-2xl" id="personal-details">
           <h2 className="text-2xl font-semibold text-white mb-4">Personal Details</h2>
           <div className="space-y-3">
             {/* --- NEW DYNAMIC FORM --- */}
@@ -243,13 +253,14 @@ function App() {
         <button 
             onClick={handleGeneratePdf} 
             disabled={isLoading} 
+            id="generate-pdf-btn"
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-[1.02] active:scale-95 shadow-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
         >
             {isLoading ? 'Generating...' : 'Generate / Refresh Preview'}
         </button>
       </div>
 
-      <div className="w-1/2 bg-slate-800/50 p-8 flex flex-col items-center">
+      <div className="w-1/2 bg-slate-800/50 p-8 flex flex-col items-center" id="pdf-preview">
         <h2 className="text-2xl font-semibold text-white mb-6">Preview</h2>
         
         {/* The Download button now opens the modal */}
@@ -321,6 +332,7 @@ function App() {
         </Modal>
 
       </div>
+      <Tour run={runTour} setRun={setRunTour} />
     </div>
   );
 }

@@ -100,6 +100,7 @@ export const ProfessionalExperienceForm = ({ resumeData, setResumeData }) => {
         <button 
           type="button" 
           onClick={addExperience} 
+          id="add-experience-btn"
           className="text-slate-400 hover:text-indigo-400 hover:bg-slate-700 p-2 rounded-lg transition-colors duration-200"
         >
           <PlusCircle size={20} />
@@ -153,7 +154,7 @@ export const ProfessionalExperienceForm = ({ resumeData, setResumeData }) => {
           
           <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Accomplishments</h4>
           {exp.points.map((point, pointIndex) => (
-            <div key={pointIndex} className="mb-4">
+            <div key={pointIndex} className="mb-4" id={expIndex === 0 && pointIndex === 0 ? 'first-accomplishment-textarea' : undefined}>
               <div className="bg-slate-700 border-2 border-slate-600 rounded-lg overflow-hidden">
                 {isImproving === `${expIndex}-${pointIndex}` ? (
                   <div className="min-h-[80px] flex flex-col justify-center items-center px-4 py-3 space-y-2">
@@ -174,7 +175,7 @@ export const ProfessionalExperienceForm = ({ resumeData, setResumeData }) => {
                     disabled={!!isImproving}
                   />
                 )}
-                <div className="border-t border-slate-600 bg-slate-800/50 px-3 py-2 flex items-center justify-between">
+                <div className="border-t border-slate-600 bg-slate-800/50 px-3 py-2 flex items-center justify-between" id={expIndex === 0 && pointIndex === 0 ? 'ai-tools-container' : undefined}>
                   <div className="flex items-center gap-2">
                     <button 
                       type="button" 

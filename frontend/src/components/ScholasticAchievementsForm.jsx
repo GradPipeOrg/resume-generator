@@ -1,4 +1,5 @@
 import { PlusCircle, Trash2 } from 'lucide-react';
+import { trackEvent } from '../services/mixpanel';
 
 export const ScholasticAchievementsForm = ({ resumeData, setResumeData }) => {
   const handleAchievementChange = (e, index) => {
@@ -13,6 +14,7 @@ export const ScholasticAchievementsForm = ({ resumeData, setResumeData }) => {
       ...prev,
       scholasticAchievements: [...prev.scholasticAchievements, { text: "" }]
     }));
+    trackEvent('Section Item Added', { section: 'Scholastic Achievements' });
   };
 
   const removeAchievement = (index) => {

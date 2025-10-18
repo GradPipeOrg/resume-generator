@@ -3,6 +3,7 @@ import subprocess
 import uuid
 import os
 import re
+import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -116,6 +117,9 @@ class ResumeData(BaseModel):
     keyProjects: List[Project]
     positionsOfResponsibility: List[Responsibility]
     extraCurriculars: List[ExtraCurricular] = []
+
+class FunnelSubmitData(BaseModel):
+    resumeData: dict
 
 def sanitize_and_format(text: str) -> str:
     # This function handles both sanitization and Markdown-style bolding.
@@ -429,3 +433,22 @@ async def improve_text(request: ImproveTextRequest):
     except Exception as e:
         print("--- AI ENDPOINT EXCEPTION OCCURRED ---"); traceback.print_exc(); print("------------------------------------")
         raise HTTPException(status_code=500, detail=f"An error occurred with the AI model: {str(e)}")
+
+@app.post("/funnel/submit")
+async def funnel_submit(data: FunnelSubmitData):
+    try:
+        # IMPORTANT: Replace with your actual Sheet Monkey Form URL
+        SHEET_MONKEY_URL = "https://api.sheetmonkey.io/form/gqCdSvbbANq35GXCKyowj4"
+        
+        # We send the data as a JSON string to the "Resume Data" field we created
+        payload = {
+            "Resume Data": str(data.resumeData)
+        }
+        
+        response = requests.post(SHEET_MONKEY_URL, json=payload)
+        response.raise_for_status() # Raises an exception for bad status codes
+        
+        return {"status": "success"}
+    except Exception as e:
+        print(f"--- FUNNEL SUBMIT EXCEPTION ---: {e}")
+        raise HTTPException(status_code=500, detail="Could not submit profile.")

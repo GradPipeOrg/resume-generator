@@ -1,6 +1,7 @@
 import { PlusCircle, Trash2, Sparkles, Loader2, ChevronsLeftRight, ChevronsRightLeft, ArrowUp, ArrowDown } from 'lucide-react';
 import { useState } from 'react';
 import axios from 'axios';
+import { trackEvent } from '../services/mixpanel';
 
 export const ExtraCurricularsForm = ({ resumeData, setResumeData, index, moveSection, isFirst, isLast }) => {
     const [isImproving, setIsImproving] = useState(null);
@@ -14,6 +15,7 @@ export const ExtraCurricularsForm = ({ resumeData, setResumeData, index, moveSec
 
     const addEc = () => {
         setResumeData(prev => ({ ...prev, extraCurriculars: [...prev.extraCurriculars, { text: "", date: "" }] }));
+        trackEvent('Section Item Added', { section: 'Extracurriculars' });
     };
 
     const removeEc = (ecIndex) => {
@@ -32,6 +34,8 @@ export const ExtraCurricularsForm = ({ resumeData, setResumeData, index, moveSec
             const newEcs = [...resumeData.extraCurriculars];
             newEcs[ecIndex].text = improved_text;
             setResumeData(prev => ({ ...prev, extraCurriculars: newEcs }));
+            
+            trackEvent('AI Tool Used', { tool: 'Improve' });
         } catch (error) { console.error("Failed to improve text:", error); alert("AI Assistant failed.");
         } finally { setIsImproving(null); }
     };
@@ -47,6 +51,8 @@ export const ExtraCurricularsForm = ({ resumeData, setResumeData, index, moveSec
             const newEcs = [...resumeData.extraCurriculars];
             newEcs[ecIndex].text = adjusted_text;
             setResumeData(prev => ({ ...prev, extraCurriculars: newEcs }));
+            
+            trackEvent('AI Tool Used', { tool: action === 'lengthen' ? 'Lengthen' : 'Shorten' });
         } catch (error) { console.error(`Failed to ${action} text:`, error); alert(`AI Assistant failed to ${action} text.`);
         } finally { setIsImproving(null); }
     };

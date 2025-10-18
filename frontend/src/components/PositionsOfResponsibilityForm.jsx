@@ -1,6 +1,7 @@
 import { PlusCircle, Trash2, Sparkles, Loader2, ChevronsLeftRight, ChevronsRightLeft } from 'lucide-react';
 import { useState } from 'react';
 import axios from 'axios';
+import { trackEvent } from '../services/mixpanel';
 
 export const PositionsOfResponsibilityForm = ({ resumeData, setResumeData }) => {
   const [isImproving, setIsImproving] = useState(null);
@@ -17,6 +18,7 @@ export const PositionsOfResponsibilityForm = ({ resumeData, setResumeData }) => 
       ...prev,
       positionsOfResponsibility: [...prev.positionsOfResponsibility, { role: "", organization: "", dates: "", description: "", points: [""] }]
     }));
+    trackEvent('Section Item Added', { section: 'Positions of Responsibility' });
   };
 
   const removePor = (index) => {
@@ -36,6 +38,7 @@ export const PositionsOfResponsibilityForm = ({ resumeData, setResumeData }) => 
     const newPors = [...resumeData.positionsOfResponsibility];
     newPors[porIndex].points.push("");
     setResumeData(prev => ({ ...prev, positionsOfResponsibility: newPors }));
+    trackEvent('Bullet Point Added', { section: 'Positions of Responsibility' });
   };
 
   const removePoint = (porIndex, pointIndex) => {
@@ -56,6 +59,8 @@ export const PositionsOfResponsibilityForm = ({ resumeData, setResumeData }) => 
       const newPors = [...resumeData.positionsOfResponsibility];
       newPors[porIndex].points[pointIndex] = improved_text;
       setResumeData(prev => ({ ...prev, positionsOfResponsibility: newPors }));
+      
+      trackEvent('AI Tool Used', { tool: 'Improve' });
       
     } catch (error) {
       console.error("Failed to improve text:", error);
@@ -78,6 +83,8 @@ export const PositionsOfResponsibilityForm = ({ resumeData, setResumeData }) => 
         const newPors = [...resumeData.positionsOfResponsibility];
         newPors[porIndex].points[pointIndex] = adjusted_text;
         setResumeData(prev => ({ ...prev, positionsOfResponsibility: newPors }));
+        
+        trackEvent('AI Tool Used', { tool: action === 'lengthen' ? 'Lengthen' : 'Shorten' });
     } catch (error) {
         console.error(`Failed to ${action} text:`, error);
         alert(`AI Assistant failed to ${action} text.`);

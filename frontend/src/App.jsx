@@ -3,6 +3,9 @@ import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Download, ArrowUp, ArrowDown } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
+import 'react-responsive-modal/styles.css'; // Import modal styles
+import { Modal } from 'react-responsive-modal';
+import { trackEvent } from './services/mixpanel';
 import './App.css';
 import { ProfessionalExperienceForm } from './components/ProfessionalExperienceForm';
 import { KeyProjectsForm } from './components/KeyProjectsForm';
@@ -89,6 +92,9 @@ function App() {
 
   const [pdfUrl, setPdfUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // --- NEW STATE FOR MODAL ---
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('resumeData', JSON.stringify(resumeData));
@@ -114,6 +120,10 @@ function App() {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/generate_pdf`, payload, { responseType: 'blob' });
       const fileUrl = URL.createObjectURL(response.data);
       setPdfUrl(fileUrl);
+
+      // --- ADD THIS LINE ---
+      trackEvent('PDF Generated Successfully');
+
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("Failed to generate PDF. Check the backend console.");
@@ -138,6 +148,25 @@ function App() {
     [newOrder[index], newOrder[newIndex]] = [newOrder[newIndex], newOrder[index]]; // Swap
     setSectionOrder(newOrder);
   };
+
+  const handleGetDiscovered = async () => {
+    trackEvent('Get Discovered Clicked');
+    setIsLoading(true);
+    try {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/funnel/submit`, { resumeData });
+      alert("Success! Your profile has been submitted to the GradPipe talent pool.");
+    } catch (error) {
+      console.error("Funnel submission failed:", error);
+      alert("Sorry, there was an error submitting your profile.");
+    } finally {
+      setIsLoading(false);
+      setOpenModal(false); // Close modal after action
+    }
+  };
+
+  // --- Functions to control the modal ---
+  const onOpenModal = () => setOpenModal(true);
+  const onCloseModal = () => setOpenModal(false);
 
   return (
     <div className="flex h-screen">
@@ -200,6 +229,17 @@ function App() {
           );
         })}
 
+        <div className="text-center">
+          <a 
+            href="https://forms.gle/4dKgr7m7VJ2GDAwb7" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-sm text-slate-400 hover:text-indigo-400 transition"
+          >
+            Spotted a bug or have feedback? Let us know!
+          </a>
+        </div>
+
         <button 
             onClick={handleGeneratePdf} 
             disabled={isLoading} 
@@ -208,25 +248,78 @@ function App() {
             {isLoading ? 'Generating...' : 'Generate / Refresh Preview'}
         </button>
       </div>
+
       <div className="w-1/2 bg-slate-800/50 p-8 flex flex-col items-center">
         <h2 className="text-2xl font-semibold text-white mb-6">Preview</h2>
+        
+        {/* The Download button now opens the modal */}
         {pdfUrl && (
-          <a
-            href={pdfUrl}
-            download={`${resumeData.personalDetails.name.replace(' ', '_')}_Resume.pdf`}
+          <button
+            onClick={onOpenModal}
             className="mb-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 flex items-center gap-2"
           >
             <Download size={20} />
             Download PDF
-          </a>
+          </button>
         )}
-        {pdfUrl ? (
-          <Document file={pdfUrl} onLoadError={(error) => console.error("React-PDF Load Error:", error)}>
-            <Page pageNumber={1} />
-          </Document>
-        ) : (
-          <p className="text-gray-300 text-center">Click the generate button to see your PDF preview.</p>
-        )}
+
+        {/* The PDF viewer section */}
+        <div className="w-full max-w-2xl aspect-[1/1.414] bg-slate-900/50 rounded-lg mt-4">
+          {pdfUrl ? (
+            <Document file={pdfUrl} onLoadError={(error) => console.error("React-PDF Load Error:", error)}>
+              <Page pageNumber={1} />
+            </Document>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-400 text-center">Click "Generate" to see your preview.</p>
+            </div>
+          )}
+        </div>
+
+        {/* --- NEW MODAL COMPONENT --- */}
+        <Modal 
+          open={openModal} 
+          onClose={onCloseModal} 
+          center 
+          classNames={{ 
+            modal: 'bg-slate-800 border border-slate-600 shadow-2xl text-white',
+            overlay: 'bg-black bg-opacity-75'
+          }}
+          styles={{
+            modal: {
+              backgroundColor: '#1e293b',
+              border: '1px solid #475569',
+              borderRadius: '0.5rem',
+              color: 'white'
+            },
+            overlay: {
+              backgroundColor: 'rgba(0, 0, 0, 0.75)'
+            }
+          }}
+        >
+          <div className="p-6 text-center space-y-4">
+            <h2 className="text-2xl font-bold text-white">Launch Your Career</h2>
+            <p className="text-slate-300">Submit your resume to get discovered by top startups in GradPipe's network.</p>
+            
+            <button
+              onClick={handleGetDiscovered}
+              disabled={isLoading}
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-5 rounded-lg transition disabled:opacity-50"
+            >
+              {isLoading ? "Submitting..." : "Download & Get Discovered"}
+            </button>
+
+            <a
+              href={pdfUrl}
+              download={`${resumeData.personalDetails.name.replace(' ', '_')}_Resume.pdf`}
+              onClick={onCloseModal} // Close modal on click
+              className="text-sm text-slate-400 hover:text-slate-200 transition"
+            >
+              No thanks, just download
+            </a>
+          </div>
+        </Modal>
+
       </div>
     </div>
   );

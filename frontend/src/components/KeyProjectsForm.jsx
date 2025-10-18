@@ -1,6 +1,7 @@
 import { PlusCircle, Trash2, Sparkles, Loader2, ChevronsLeftRight, ChevronsRightLeft } from 'lucide-react';
 import { useState } from 'react';
 import axios from 'axios';
+import { trackEvent } from '../services/mixpanel';
 
 export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
   const [isImproving, setIsImproving] = useState(null);
@@ -17,6 +18,7 @@ export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
       ...prev,
       keyProjects: [...prev.keyProjects, { name: "", subtitle: "", dates: "", description: "", points: [""] }]
     }));
+    trackEvent('Section Item Added', { section: 'Projects' });
   };
 
   const removeProject = (index) => {
@@ -36,6 +38,7 @@ export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
     const newProjects = [...resumeData.keyProjects];
     newProjects[projIndex].points.push("");
     setResumeData(prev => ({ ...prev, keyProjects: newProjects }));
+    trackEvent('Bullet Point Added', { section: 'Projects' });
   };
 
   const removePoint = (projIndex, pointIndex) => {
@@ -56,6 +59,8 @@ export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
       const newProjects = [...resumeData.keyProjects];
       newProjects[projIndex].points[pointIndex] = improved_text;
       setResumeData(prev => ({ ...prev, keyProjects: newProjects }));
+      
+      trackEvent('AI Tool Used', { tool: 'Improve' });
       
     } catch (error) {
       console.error("Failed to improve text:", error);
@@ -78,6 +83,8 @@ export const KeyProjectsForm = ({ resumeData, setResumeData }) => {
         const newProjects = [...resumeData.keyProjects];
         newProjects[projIndex].points[pointIndex] = adjusted_text;
         setResumeData(prev => ({ ...prev, keyProjects: newProjects }));
+        
+        trackEvent('AI Tool Used', { tool: action === 'lengthen' ? 'Lengthen' : 'Shorten' });
     } catch (error) {
         console.error(`Failed to ${action} text:`, error);
         alert(`AI Assistant failed to ${action} text.`);

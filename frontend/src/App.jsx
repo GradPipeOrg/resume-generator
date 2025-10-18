@@ -12,7 +12,6 @@ import { KeyProjectsForm } from './components/KeyProjectsForm';
 import { PositionsOfResponsibilityForm } from './components/PositionsOfResponsibilityForm';
 import { ScholasticAchievementsForm } from './components/ScholasticAchievementsForm';
 import { ExtraCurricularsForm } from './components/ExtraCurricularsForm';
-import { Analytics } from "@vercel/analytics/next"
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 

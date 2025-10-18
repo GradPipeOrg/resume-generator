@@ -37,7 +37,7 @@ const initialData = {
     linkedin_url: "https://www.linkedin.com/in/adolf-hitler-1900", 
     github_url: "https://github.com/adolf-hitler-1900", 
     location: "Berlin, Germany", 
-    cpi: "6 Million", 
+    cpi: "6.9", 
     grad_year: "1945", 
     roll_no: "4567890", 
     dob: "20/04/1900", 

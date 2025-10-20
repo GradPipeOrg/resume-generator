@@ -109,7 +109,8 @@ class Responsibility(BaseModel): role: str = ""; organization: str = ""; dates: 
 class ExtraCurricular(BaseModel): text: str = ""; date: str = ""
 
 class ResumeData(BaseModel):
-    template_name: str
+    header_id: str
+    body_id: str
     sectionOrder: List[str]
     personalDetails: PersonalDetails
     scholasticAchievements: List[ScholasticAchievement]
@@ -339,6 +340,73 @@ def generate_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> s
     latex_string += f"\\begin{{itemize}}[itemsep=0mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
     return latex_string
 
+# --- NEW: Dense Blue Style LaTeX Generation Functions ---
+
+def generate_dense_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
+    if not achievements: return ""
+    latex_string = "\\section*{\\LARGE \\color{myblue}Scholastic Achievements\\xfilll[0pt]{0.5pt}}\n\\vspace{-12pt}\n"
+    items = "".join([f"    \\item {sanitize_and_format(ach.text)}\n" for ach in achievements])
+    latex_string += f"\\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-28pt}\n"
+    return latex_string
+
+def generate_dense_experience_latex(experiences: List[Experience]) -> str:
+    if not experiences: return ""
+    latex_string = "\\section*{\\LARGE \\color{myblue}Professional Experience\\xfilll[0pt]{1pt}}\n\\vspace{-12pt}\n"
+    for i, exp in enumerate(experiences):
+        if i > 0: latex_string += "\\vspace{-10pt}\n"
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
+        description_latex = f"\\textit{{{sanitize_and_format(exp.description)}}}" if exp.description else ""
+        latex_string += f"""
+{{\\large \\textbf{{{sanitize_and_format(exp.company)}}}}} | {{\\large \\textbf{{{sanitize_and_format(exp.role)}}}}} \\hfill{{{sanitize_and_format(exp.dates)}}}
+\\hfill{{{description_latex}}}
+\\vspace{{-12pt}}
+\\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]
+{points_latex}\\end{{itemize}}
+"""
+    if experiences: latex_string += "\\vspace{-28pt}\n"
+    return latex_string
+
+def generate_dense_projects_latex(projects: List[Project]) -> str:
+    if not projects: return ""
+    latex_string = "\\section*{\\LARGE \\color{myblue}Key Projects\\xfilll[0pt]{1pt}}\n\\vspace{-12pt}\n"
+    for i, proj in enumerate(projects):
+        if i > 0: latex_string += "\\vspace{-10pt}\n"
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in proj.points if point.strip()])
+        subtitle_latex = f"| \\textit{{{sanitize_and_format(proj.subtitle)}}}" if proj.subtitle else ""
+        description_latex = f"\\hfill{{\\textit{{{sanitize_and_format(proj.description)}}}}}" if proj.description else ""
+        latex_string += f"""
+{{\\large \\textbf{{{sanitize_and_format(proj.name)}}}}} {subtitle_latex} \\hfill{{{sanitize_and_format(proj.dates)}}}
+{description_latex}
+\\vspace{{-12pt}}
+\\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]
+{points_latex}\\end{{itemize}}
+"""
+    if projects: latex_string += "\\vspace{-28pt}\n"
+    return latex_string
+
+def generate_dense_por_latex(pors: List[Responsibility]) -> str:
+    if not pors: return ""
+    latex_string = "\\section*{\\LARGE \\color{myblue}Positions of Responsibility\\xfilll[0pt]{1pt}}\n\\vspace{-12pt}\n"
+    for i, por in enumerate(pors):
+        if i > 0: latex_string += "\\vspace{-8pt}\n"
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in por.points if point.strip()])
+        latex_string += f"""
+{{\\large \\textbf{{{sanitize_and_format(por.role)}}}}} | {sanitize_and_format(por.organization)} \\hfill{{{sanitize_and_format(por.dates)}}}
+\\vspace{{-10pt}}
+\\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]
+{points_latex}\\end{{itemize}}
+"""
+    if pors: latex_string += "\\vspace{-18pt}\n"
+    return latex_string
+
+def generate_dense_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> str:
+    if not extracurriculars: return ""
+    latex_string = "\\section*{\\LARGE \\color{myblue}Extra-Curricular Activities\\xfilll[0pt]{1pt}}\n\\vspace{-12pt}\n"
+    items = "".join([f"    \\item {sanitize_and_format(ec.text)} \\hfill {{{sanitize_and_format(ec.date)}}}\n" for ec in extracurriculars if ec.text.strip()])
+    latex_string += f"\\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    return latex_string
+
 # --- FastAPI App ---
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
@@ -346,43 +414,65 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 @app.post("/generate_pdf")
 async def generate_pdf(resume_data: ResumeData):
     try:
-        template_filename = resume_data.template_name
-        if '..' in template_filename: raise HTTPException(status_code=400, detail="Invalid template name")
-        template_path = os.path.join("templates", template_filename)
-        if not os.path.exists(template_path): raise HTTPException(status_code=404, detail=f"Template '{template_filename}' not found")
+        # --- 1. Validate Body Template ---
+        body_id = resume_data.body_id
+        if '..' in body_id: raise HTTPException(status_code=400, detail="Invalid body template name")
+        template_path = os.path.join("templates", body_id)
+        if not os.path.exists(template_path): raise HTTPException(status_code=404, detail=f"Body template '{body_id}' not found")
         
         with open(template_path, "r", encoding='utf-8') as f: latex_template = f.read()
-        
-        # --- NEW DYNAMIC SECTION GENERATION ---
-        # Map section keys to their generator functions
-        section_generators = {
+
+        # --- 2. Define Header and Body Style Dispatchers ---
+        header_generators = {
+            "iitb": generate_iitb_header_latex,
+            "universal": generate_universal_header_latex,
+            "blank": generate_blank_header_latex,
+        }
+
+        universal_style_sections = {
             "scholasticAchievements": generate_scholastic_latex,
             "professionalExperience": generate_experience_latex,
             "keyProjects": generate_projects_latex,
             "positionsOfResponsibility": generate_por_latex,
             "extraCurriculars": generate_extracurricular_latex,
         }
-        
-        dynamic_content = ""
-        # Iterate through the user-defined order from the frontend
-        for section_key in resume_data.sectionOrder:
-            if section_key in section_generators:
-                # Get the corresponding data for that section (e.g., resume_data.professionalExperience)
-                section_data = getattr(resume_data, section_key, [])
-                # Call the generator function for that section
-                section_latex = section_generators[section_key](section_data)
-                if section_latex: # Only add if the section is not empty
-                    dynamic_content += section_latex + "\n"
 
-        # --- MODIFIED: Smart Header Generation ---
-        header_latex = "" # Default to no header
-        if "header_free" in resume_data.template_name:
-            header_latex = generate_blank_header_latex() # Use the new blank header function
-        elif "iitb" in resume_data.template_name:
-            header_latex = generate_iitb_header_latex(resume_data.personalDetails)
-        else: # Default for all other templates like universal_one_page, two_page, etc.
-            header_latex = generate_universal_header_latex(resume_data.personalDetails)
+        dense_blue_style_sections = {
+            "scholasticAchievements": generate_dense_scholastic_latex,
+            "professionalExperience": generate_dense_experience_latex,
+            "keyProjects": generate_dense_projects_latex,
+            "positionsOfResponsibility": generate_dense_por_latex,
+            "extraCurriculars": generate_dense_extracurricular_latex,
+        }
         
+        body_style_map = {
+            "iitb_one_page.tex": universal_style_sections,
+            "dense_blue.tex": dense_blue_style_sections,
+        }
+
+        # --- 3. Generate Header LaTeX ---
+        header_id = resume_data.header_id
+        header_func = header_generators.get(header_id)
+        if not header_func: raise HTTPException(status_code=400, detail=f"Invalid header_id: {header_id}")
+        header_latex = header_func(resume_data.personalDetails) if header_id != "blank" else header_func()
+
+        # --- 4. Generate Dynamic Content LaTeX based on Body Style ---
+        section_generators = body_style_map.get(body_id)
+        if not section_generators:
+            # Default to universal style if the body_id is not explicitly mapped
+            section_generators = universal_style_sections
+
+        dynamic_content = ""
+        for section_key in resume_data.sectionOrder:
+            generator_func = section_generators.get(section_key)
+            if generator_func:
+                section_data = getattr(resume_data, section_key, [])
+                if section_data: # Only process if there's data
+                    section_latex = generator_func(section_data)
+                    if section_latex:
+                        dynamic_content += section_latex + "\n"
+        
+        # --- 5. Populate Template and Compile PDF ---
         latex_template = latex_template.replace("__PERSONAL_DETAILS_SECTION__", header_latex)
         latex_template = latex_template.replace("__DYNAMIC_CONTENT_SECTION__", dynamic_content)
         
@@ -390,8 +480,9 @@ async def generate_pdf(resume_data: ResumeData):
         tex_filepath = f"{session_id}.tex"
         with open(tex_filepath, "w", encoding='utf-8') as f: f.write(latex_template)
         
-        subprocess.run(['pdflatex', f'-output-directory=/app', '-interaction=nonstopmode', tex_filepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        process = subprocess.run(['pdflatex', f'-output-directory=/app', '-interaction=nonstopmode', tex_filepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # We run it twice to ensure cross-references are resolved properly
+        subprocess.run(['pdflatex', '-interaction=nonstopmode', tex_filepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(['pdflatex', '-interaction=nonstopmode', tex_filepath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         pdf_filepath = f"{session_id}.pdf"
         if not os.path.exists(pdf_filepath):

@@ -18,24 +18,25 @@ import { Tour } from './components/Tour';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 
-// --- Template Configuration ---
-const templates = {
-  'universal_one_page.tex': {
-    name: '1-Page Universal',
+// --- NEW: Decoupled Template Configuration ---
+const headerOptions = {
+  'universal': {
+    name: 'Universal',
     headerFields: ['name', 'branch', 'institution', 'cpi', 'grad_year', 'location', 'email', 'phone', 'linkedin_url', 'github_url']
   },
-  'iitb_one_page.tex': {
-    name: '1-Page IITB Style',
+  'iitb': {
+    name: 'IITB Official',
     headerFields: ['name', 'branch', 'roll_no', 'cpi', 'dob', 'gender']
   },
-  'two_page.tex': {
-    name: '2-Page Detailed',
-    headerFields: ['name', 'branch', 'institution', 'cpi', 'grad_year', 'location', 'email', 'phone', 'linkedin_url', 'github_url']
-  },
-  'universal_header_free.tex': {
-    name: 'Header-Free',
-    headerFields: [] // No personal details form will be shown for this template
+  'blank': {
+    name: 'Placement Cell (Blank)',
+    headerFields: []
   }
+};
+
+const bodyOptions = {
+  'iitb_one_page.tex': { name: 'IITB Style' },
+  'dense_blue.tex': { name: 'IITB Style(Dense)' },
 };
 
 const initialData = {
@@ -76,7 +77,8 @@ const sectionComponents = {
 };
 
 function App() {
-  const [template, setTemplate] = useState('universal_one_page.tex');
+  const [headerId, setHeaderId] = useState('universal');
+  const [bodyId, setBodyId] = useState('universal_one_page.tex');
   const [resumeData, setResumeData] = useState(() => {
     const savedData = localStorage.getItem('resumeData');
     if (savedData) {
@@ -129,7 +131,7 @@ function App() {
   const handleGeneratePdf = async () => {
     setIsLoading(true);
     // Include sectionOrder in the payload
-    const payload = { ...resumeData, sectionOrder, template_name: template };
+    const payload = { ...resumeData, sectionOrder, header_id: headerId, body_id: bodyId };
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/generate_pdf`, payload, { responseType: 'blob' });
       const fileUrl = URL.createObjectURL(response.data);
@@ -203,33 +205,53 @@ function App() {
         </div>
         <Tooltip id="main-tooltip" />
         
-                {/* --- NEW: Upgraded Template Selector UI --- */}
-        <div className="bg-slate-800 rounded-xl p-6 shadow-2xl" id="template-selector">
-          <h2 className="text-2xl font-semibold text-white mb-4">Select Template</h2>
-          <div className="flex flex-wrap gap-3">
-            {Object.entries(templates).map(([fileName, { name }]) => (
-              <button
-                key={fileName}
-                onClick={() => setTemplate(fileName)}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
-                  template === fileName 
-                    ? 'bg-indigo-600 text-white shadow-lg' 
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                }`}
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-        </div>
+{/* --- NEW: Decoupled Template Selectors --- */}
+<div className="bg-slate-800 rounded-xl p-6 shadow-2xl space-y-6" id="template-selectors">
+  <div>
+    <h2 className="text-2xl font-semibold text-white mb-4">Header Style</h2>
+    <div className="flex flex-wrap gap-3">
+      {Object.entries(headerOptions).map(([id, { name }]) => (
+        <button
+          key={id}
+          onClick={() => setHeaderId(id)}
+          className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+            headerId === id 
+              ? 'bg-indigo-600 text-white shadow-lg' 
+              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+          }`}
+        >
+          {name}
+        </button>
+      ))}
+    </div>
+  </div>
+  <div>
+    <h2 className="text-2xl font-semibold text-white mb-4">Body Style</h2>
+    <div className="flex flex-wrap gap-3">
+      {Object.entries(bodyOptions).map(([fileName, { name }]) => (
+        <button
+          key={fileName}
+          onClick={() => setBodyId(fileName)}
+          className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+            bodyId === fileName 
+              ? 'bg-indigo-600 text-white shadow-lg' 
+              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+          }`}
+        >
+          {name}
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
 
-        <div className="bg-slate-800 rounded-xl p-6 shadow-2xl" id="personal-details">
-          <h2 className="text-2xl font-semibold text-white mb-4">Personal Details</h2>
-          <div className="space-y-3">
-            {/* --- NEW DYNAMIC FORM --- */}
-            {templates[template].headerFields.map((fieldName) => {
-                // Simple title generation from fieldName
-                const placeholder = fieldName.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+{/* --- MODIFIED: Conditionally render Personal Details section --- */}
+{headerOptions[headerId].headerFields.length > 0 && (
+    <div className="bg-slate-800 rounded-xl p-6 shadow-2xl" id="personal-details">
+        <h2 className="text-2xl font-semibold text-white mb-4">Personal Details</h2>
+        <div className="space-y-3">
+            {headerOptions[headerId].headerFields.map((fieldName) => {
+                const placeholder = fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                 return (
                     <input
                         key={fieldName}
@@ -241,8 +263,9 @@ function App() {
                     />
                 );
             })}
-          </div>
         </div>
+    </div>
+)}
 
         {/* Dynamically Ordered Sections */}
         {sectionOrder.map((sectionKey, index) => {

@@ -1,0 +1,37 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[a4paper, bottom = 6.4mm,left = 14.11 mm, right = 14.11 mm, top = 0.6in]{geometry}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{enumitem,xcolor}
+\usepackage{wrapfig}
+\usepackage{microtype}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage{textcomp}
+\usepackage[colorlinks=false]{hyperref}
+\usepackage{verbatim}
+\usepackage[charter]{mathdesign}
+\usepackage[usenames, dvipsnames]{color}
+
+% --- Custom Styling from Original Template ---
+\definecolor{myblue}{RGB}{76,81,150}
+\newcommand{\xfilll}[2][1ex]{
+    \dimen0=#2\advance\dimen0 by #1
+    \leaders\hrule height \dimen0 depth -#1\hfill
+}
+\titleformat{\section}{\large\scshape\raggedright}{}{0em}{}
+\renewcommand\labelitemi{\raisebox{0.4ex}{\tiny$\bullet$}}
+\renewcommand{\labelitemii}{$\cdot$}
+\pagenumbering{gobble}
+% --- End of Custom Styling ---
+
+\begin{document}
+
+__PERSONAL_DETAILS_SECTION__
+
+__DYNAMIC_CONTENT_SECTION__
+
+\end{document}

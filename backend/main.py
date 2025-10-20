@@ -260,6 +260,11 @@ def generate_universal_header_latex(details: PersonalDetails) -> str:
 \\vspace{{-2mm}}
 """
 
+def generate_blank_header_latex() -> str:
+    # This function generates a vertical space of 3.5cm.
+    # This value can be adjusted later if the placement cell requires a different size.
+    return "\\vspace*{3.5cm}\n"
+
 def generate_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
     if not achievements: return ""
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Scholastic Achievements} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
@@ -369,10 +374,13 @@ async def generate_pdf(resume_data: ResumeData):
                 if section_latex: # Only add if the section is not empty
                     dynamic_content += section_latex + "\n"
 
-        # --- Smart Header Generation ---
-        if "iitb" in resume_data.template_name.lower():
+        # --- MODIFIED: Smart Header Generation ---
+        header_latex = "" # Default to no header
+        if "header_free" in resume_data.template_name:
+            header_latex = generate_blank_header_latex() # Use the new blank header function
+        elif "iitb" in resume_data.template_name:
             header_latex = generate_iitb_header_latex(resume_data.personalDetails)
-        else:
+        else: # Default for all other templates like universal_one_page, two_page, etc.
             header_latex = generate_universal_header_latex(resume_data.personalDetails)
         
         latex_template = latex_template.replace("__PERSONAL_DETAILS_SECTION__", header_latex)

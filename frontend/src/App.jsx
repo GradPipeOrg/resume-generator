@@ -1,3 +1,5 @@
+/**
+ * App.jsx is the main component for the Resume Generator application.*/
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -25,6 +27,14 @@ const templates = {
   'iitb_one_page.tex': {
     name: '1-Page IITB Style',
     headerFields: ['name', 'branch', 'roll_no', 'cpi', 'dob', 'gender']
+  },
+  'two_page.tex': {
+    name: '2-Page Detailed',
+    headerFields: ['name', 'branch', 'institution', 'cpi', 'grad_year', 'location', 'email', 'phone', 'linkedin_url', 'github_url']
+  },
+  'universal_header_free.tex': {
+    name: 'Header-Free',
+    headerFields: [] // No personal details form will be shown for this template
   }
 };
 
@@ -159,6 +169,15 @@ function App() {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/funnel/submit`, { resumeData });
       alert("Success! Your profile has been submitted to the GradPipe talent pool.");
+      // Trigger PDF download on successful submission
+      if (pdfUrl) {
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = `${resumeData.personalDetails.name.replace(' ', '_')}_Resume.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     } catch (error) {
       console.error("Funnel submission failed:", error);
       alert("Sorry, there was an error submitting your profile.");
@@ -184,13 +203,24 @@ function App() {
         </div>
         <Tooltip id="main-tooltip" />
         
+                {/* --- NEW: Upgraded Template Selector UI --- */}
         <div className="bg-slate-800 rounded-xl p-6 shadow-2xl" id="template-selector">
           <h2 className="text-2xl font-semibold text-white mb-4">Select Template</h2>
-          <select value={template} onChange={handleTemplateChange} className="input-style">
+          <div className="flex flex-wrap gap-3">
             {Object.entries(templates).map(([fileName, { name }]) => (
-              <option key={fileName} value={fileName}>{name}</option>
+              <button
+                key={fileName}
+                onClick={() => setTemplate(fileName)}
+                className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                  template === fileName 
+                    ? 'bg-indigo-600 text-white shadow-lg' 
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                {name}
+              </button>
             ))}
-          </select>
+          </div>
         </div>
 
         <div className="bg-slate-800 rounded-xl p-6 shadow-2xl" id="personal-details">

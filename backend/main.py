@@ -268,17 +268,17 @@ def generate_blank_header_latex() -> str:
 
 def generate_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
     if not achievements: return ""
-    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Scholastic Achievements} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Scholastic Achievements} \\vhrulefill{1pt}}}\n\\vspace{-12pt}\n"
     items = "".join([f"    \\item {sanitize_and_format(ach.text)}\n" for ach in achievements])
-    latex_string += f"\\begin{{itemize}}[itemsep=-0.8mm,leftmargin=*]\n{items}\\end{{itemize}}\n"
-    latex_string += "\\vspace{-6mm}\n"
+    latex_string += f"\\begin{{itemize}}[itemsep=-1.55mm,leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-28pt}\n"
     return latex_string
 
 def generate_experience_latex(experiences: List[Experience]) -> str:
     if not experiences: return ""
-    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Professional Experience} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Professional Experience} \\vhrulefill{1pt}}}\n\\vspace{-12pt}\n"
     for i, exp in enumerate(experiences):
-        if i > 0: latex_string += "\\vspace{1mm}\n" # Add a small space BETWEEN experiences
+        if i > 0: latex_string += "\\vspace{-10pt}\n"
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
         description_latex = f"\\vspace{{-1.5mm}}\n\\textit{{{sanitize_and_format(exp.description)}}}\n\\vspace{{-1mm}}" if exp.description else ""
         latex_string += f"""
@@ -288,17 +288,17 @@ def generate_experience_latex(experiences: List[Experience]) -> str:
 \\vspace{{-3mm}}
 \\\\ \\rule{{\\textwidth}}{{0.2mm}}
 {description_latex}
-\\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
+\\begin{{itemize}}[itemsep=-1.55mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 """
-    if experiences: latex_string += "\\vspace{-6mm}\n" # Add final space after the whole section
+    if experiences: latex_string += "\\vspace{-28pt}\n"
     return latex_string
 
 def generate_projects_latex(projects: List[Project]) -> str:
     if not projects: return ""
-    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Key Projects} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Key Projects} \\vhrulefill{1pt}}}\n\\vspace{-12pt}\n"
     for i, proj in enumerate(projects):
-        if i > 0: latex_string += "\\vspace{-0.5mm}\n"
+        if i > 0: latex_string += "\\vspace{-10pt}\n"
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in proj.points if point.strip()])
         description_latex = f"\\vspace{{-1.5mm}}\n\\textit{{{sanitize_and_format(proj.description)}}}\n\\vspace{{-1mm}}" if proj.description else ""
         latex_string += f"""
@@ -308,17 +308,17 @@ def generate_projects_latex(projects: List[Project]) -> str:
 \\vspace{{-3mm}}
 \\\\ \\rule{{\\textwidth}}{{0.2mm}}
 {description_latex}
-\\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
+\\begin{{itemize}}[itemsep=-1.55mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 """
-    if projects: latex_string += "\\vspace{-6mm}\n"
+    if projects: latex_string += "\\vspace{-28pt}\n"
     return latex_string
 
 def generate_por_latex(pors: List[Responsibility]) -> str:
     if not pors: return ""
-    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Positions of Responsibility} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Positions of Responsibility} \\vhrulefill{1pt}}}\n\\vspace{-12pt}\n"
     for i, por in enumerate(pors):
-        if i > 0: latex_string += "\\vspace{-0.5mm}\n"
+        if i > 0: latex_string += "\\vspace{-8pt}\n"
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in por.points if point.strip()])
         latex_string += f"""
 \\noindent \\textbf{{\\large {sanitize_and_format(por.role)}}} | {sanitize_and_format(por.organization)} \\hfill{{\\textit{{{sanitize_and_format(por.dates)}}}}} 
@@ -327,17 +327,17 @@ def generate_por_latex(pors: List[Responsibility]) -> str:
 \\vspace{{-1.5mm}}
 \\textit{{{sanitize_and_format(por.description)}}}
 \\vspace{{-1mm}}
-\\begin{{itemize}}[itemsep=0mm, leftmargin=6mm]
+\\begin{{itemize}}[itemsep=-1.55mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 """
-    if pors: latex_string += "\\vspace{-6mm}\n"
+    if pors: latex_string += "\\vspace{-18pt}\n"
     return latex_string
 
 def generate_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> str:
     if not extracurriculars: return ""
-    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Extra-Curricular Activities} \\vhrulefill{1pt}}}\n\\vspace{-2mm}\n"
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Extra-Curricular Activities} \\vhrulefill{1pt}}}\n\\vspace{-12pt}\n"
     items = "".join([f"    \\item {sanitize_and_format(ec.text)} \\hfill {{\\sl \\small [{sanitize_and_format(ec.date)}]}}\n" for ec in extracurriculars if ec.text.strip()])
-    latex_string += f"\\begin{{itemize}}[itemsep=0mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += f"\\begin{{itemize}}[itemsep=-1.55mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
     return latex_string
 
 # --- NEW: Dense Blue Style LaTeX Generation Functions ---

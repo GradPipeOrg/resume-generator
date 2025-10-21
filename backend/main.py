@@ -363,6 +363,7 @@ def generate_dense_experience_latex(experiences: List[Experience]) -> str:
         description_latex = f"\\textit{{{sanitize_and_format(exp.description)}}}" if exp.description else ""
         latex_string += f"""
 {{\\large \\textbf{{{sanitize_and_format(exp.company)}}}}} | {{\\large \\textbf{{{sanitize_and_format(exp.role)}}}}} \\hfill{{{sanitize_and_format(exp.dates)}}}
+\\\\  
 \\hfill{{{description_latex}}}
 \\vspace{{-12pt}}
 \\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]
@@ -377,11 +378,17 @@ def generate_dense_projects_latex(projects: List[Project]) -> str:
     for i, proj in enumerate(projects):
         if i > 0: latex_string += "\\vspace{-10pt}\n"
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in proj.points if point.strip()])
-        subtitle_latex = f"| \\textit{{{sanitize_and_format(proj.subtitle)}}}" if proj.subtitle else ""
-        description_latex = f"\\hfill{{\\textit{{{sanitize_and_format(proj.description)}}}}}" if proj.description else ""
+        
+        # --- Corrected Logic ---
+        # Format subtitle to match the "Company | Role" style
+        subtitle_latex = f"| {{\\large \\textbf{{{sanitize_and_format(proj.subtitle)}}}}}" if proj.subtitle else ""
+        # Format description to match the "perfect" experience model
+        description_latex = f"\\textit{{{sanitize_and_format(proj.description)}}}" if proj.description else ""
+        
         latex_string += f"""
 {{\\large \\textbf{{{sanitize_and_format(proj.name)}}}}} {subtitle_latex} \\hfill{{{sanitize_and_format(proj.dates)}}}
-{description_latex}
+\\\\ 
+\\hfill{{{description_latex}}}
 \\vspace{{-12pt}}
 \\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]
 {points_latex}\\end{{itemize}}

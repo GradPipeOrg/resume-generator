@@ -365,7 +365,7 @@ def generate_dense_experience_latex(experiences: List[Experience]) -> str:
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
         description_latex = f"\\textit{{{sanitize_and_format(exp.description)}}}" if exp.description else ""
         latex_string += f"""
-{{\\large \\textbf{{{sanitize_and_format(exp.company)}}}}} | {{\\large \\textbf{{{sanitize_and_format(exp.role)}}}}} \\hfill{{{sanitize_and_format(exp.dates)}}}
+\\noindent {{\\large \\textbf{{{sanitize_and_format(exp.company)}}}}} | {{\\large \\textbf{{{sanitize_and_format(exp.role)}}}}} \\hfill{{{sanitize_and_format(exp.dates)}}}
 \\\\  
 \\hfill{{{description_latex}}}
 \\vspace{{-12pt}}
@@ -389,7 +389,7 @@ def generate_dense_projects_latex(projects: List[Project]) -> str:
         description_latex = f"\\textit{{{sanitize_and_format(proj.description)}}}" if proj.description else ""
         
         latex_string += f"""
-{{\\large \\textbf{{{sanitize_and_format(proj.name)}}}}} {subtitle_latex} \\hfill{{{sanitize_and_format(proj.dates)}}}
+\\noindent {{\\large \\textbf{{{sanitize_and_format(proj.name)}}}}} {subtitle_latex} \\hfill{{{sanitize_and_format(proj.dates)}}}
 \\\\ 
 \\hfill{{{description_latex}}}
 \\vspace{{-12pt}}
@@ -406,7 +406,7 @@ def generate_dense_por_latex(pors: List[Responsibility]) -> str:
         if i > 0: latex_string += "\\vspace{-8pt}\n"
         points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in por.points if point.strip()])
         latex_string += f"""
-{{\\large \\textbf{{{sanitize_and_format(por.role)}}}}} | {sanitize_and_format(por.organization)} \\hfill{{{sanitize_and_format(por.dates)}}}
+\\noindent {{\\large \\textbf{{{sanitize_and_format(por.role)}}}}} | {sanitize_and_format(por.organization)} \\hfill{{{sanitize_and_format(por.dates)}}}
 \\vspace{{-10pt}}
 \\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]
 {points_latex}\\end{{itemize}}

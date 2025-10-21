@@ -1,5 +1,5 @@
 /**
- * App.jsx is the main component for the Resume Generator application.*/
+ * App.jsx is the main component for the Resume Generator application*/
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';

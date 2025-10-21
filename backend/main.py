@@ -189,6 +189,8 @@ def generate_iitb_header_latex(details: PersonalDetails) -> str:
     \\textbf{{Examination}} & \\textbf{{Institute}} & \\textbf{{Year}} & \\textbf{{CPI / \\%}} \\\\ \\hline
     Graduation & {sanitize_and_format(details.institution)} & 2027 & {sanitize_and_format(details.cpi)} \\\\ \\hline
 \\end{{tabular*}}
+
+\\vspace{{-28pt}} % Pulls the next section up
 """
 
 def generate_personal_details_latex(details: PersonalDetails) -> str:
@@ -262,7 +264,7 @@ def generate_universal_header_latex(details: PersonalDetails) -> str:
 
 \\vspace{{4mm}}
 \\rule{{\\textwidth}}{{0.4pt}}
-\\vspace{{-2mm}}
+\\vspace{{-28pt}} % Pulls the next section up
 """
 
 def generate_blank_header_latex() -> str:
@@ -342,6 +344,7 @@ def generate_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> s
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Extra-Curricular Activities} \\vhrulefill{1pt}}}\n\\vspace{-12pt}\n"
     items = "".join([f"    \\item {sanitize_and_format(ec.text)} \\hfill {{\\sl \\small [{sanitize_and_format(ec.date)}]}}\n" for ec in extracurriculars if ec.text.strip()])
     latex_string += f"\\begin{{itemize}}[itemsep=-1.55mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-28pt}\n" # Pulls the next section up
     return latex_string
 
 # --- NEW: Dense Blue Style LaTeX Generation Functions ---
@@ -416,6 +419,7 @@ def generate_dense_extracurricular_latex(extracurriculars: List[ExtraCurricular]
     latex_string = "\\section*{\\LARGE \\color{myblue}Extra-Curricular Activities\\xfilll[0pt]{1pt}}\n\\vspace{-12pt}\n"
     items = "".join([f"    \\item {sanitize_and_format(ec.text)} \\hfill {{{sanitize_and_format(ec.date)}}}\n" for ec in extracurriculars if ec.text.strip()])
     latex_string += f"\\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-28pt}\n" # Pulls the next section up
     return latex_string
 
 def generate_technical_skills_latex(skills: List[TechnicalSkill]) -> str:

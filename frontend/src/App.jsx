@@ -78,7 +78,7 @@ const sectionComponents = {
 
 function App() {
   const [headerId, setHeaderId] = useState('universal');
-  const [bodyId, setBodyId] = useState('universal_one_page.tex');
+  const [bodyId, setBodyId] = useState('iitb_one_page.tex');
   const [resumeData, setResumeData] = useState(() => {
     const savedData = localStorage.getItem('resumeData');
     if (savedData) {

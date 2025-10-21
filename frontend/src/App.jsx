@@ -14,6 +14,7 @@ import { KeyProjectsForm } from './components/KeyProjectsForm';
 import { PositionsOfResponsibilityForm } from './components/PositionsOfResponsibilityForm';
 import { ScholasticAchievementsForm } from './components/ScholasticAchievementsForm';
 import { ExtraCurricularsForm } from './components/ExtraCurricularsForm';
+import { TechnicalSkillsForm } from './components/TechnicalSkillsForm';
 import { Tour } from './components/Tour';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
@@ -64,7 +65,8 @@ const initialData = {
   ], 
   keyProjects: [], 
   positionsOfResponsibility: [], 
-  extraCurriculars: []
+  extraCurriculars: [],
+  technicalSkills: []
 };
 
 // Map keys to components and titles
@@ -74,6 +76,7 @@ const sectionComponents = {
     keyProjects: { Component: KeyProjectsForm, title: "Key Projects" },
     positionsOfResponsibility: { Component: PositionsOfResponsibilityForm, title: "Positions of Responsibility" },
     extraCurriculars: { Component: ExtraCurricularsForm, title: "Extracurricular Activities" },
+    technicalSkills: { Component: TechnicalSkillsForm, title: "Technical Skills" },
 };
 
 function App() {
@@ -86,6 +89,9 @@ function App() {
       // Ensure extraCurriculars field exists in saved data
       if (!parsedData.extraCurriculars) {
         parsedData.extraCurriculars = [];
+      }
+      if (!parsedData.technicalSkills) {
+        parsedData.technicalSkills = [];
       }
       return parsedData;
     }
@@ -100,9 +106,12 @@ function App() {
       if (!parsedOrder.includes('extraCurriculars')) {
         parsedOrder.push('extraCurriculars');
       }
+      if (!parsedOrder.includes('technicalSkills')) {
+        parsedOrder.push('technicalSkills');
+      }
       return parsedOrder;
     }
-    return ['scholasticAchievements', 'professionalExperience', 'keyProjects', 'positionsOfResponsibility', 'extraCurriculars'];
+    return ['scholasticAchievements', 'professionalExperience', 'keyProjects', 'technicalSkills', 'positionsOfResponsibility', 'extraCurriculars'];
   });
 
   const [pdfUrl, setPdfUrl] = useState(null);

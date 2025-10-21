@@ -107,6 +107,9 @@ class Experience(BaseModel): company: str = ""; role: str = ""; dates: str = "";
 class Project(BaseModel): name: str = ""; subtitle: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
 class Responsibility(BaseModel): role: str = ""; organization: str = ""; dates: str = ""; description: str = ""; points: List[str] = []
 class ExtraCurricular(BaseModel): text: str = ""; date: str = ""
+class TechnicalSkill(BaseModel):
+    category: str = ""
+    skills: str = ""
 
 class ResumeData(BaseModel):
     header_id: str
@@ -118,6 +121,7 @@ class ResumeData(BaseModel):
     keyProjects: List[Project]
     positionsOfResponsibility: List[Responsibility]
     extraCurriculars: List[ExtraCurricular] = []
+    technicalSkills: List[TechnicalSkill] = []
 
 class FunnelSubmitData(BaseModel):
     resumeData: dict
@@ -407,6 +411,24 @@ def generate_dense_extracurricular_latex(extracurriculars: List[ExtraCurricular]
     latex_string += f"\\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
     return latex_string
 
+def generate_technical_skills_latex(skills: List[TechnicalSkill]) -> str:
+    if not skills: return ""
+    latex_string = "\\section*{\\textcolor{Blue}{\\Large{Technical Skills} \\vhrulefill{1pt}}}\n\\vspace{-12pt}\n"
+    # Note the \textbf for category and the colon
+    items = "".join([f"    \\item \\textbf{{{sanitize_and_format(skill.category)}:}} {sanitize_and_format(skill.skills)}\n" for skill in skills if skill.category or skill.skills])
+    latex_string += f"\\begin{{itemize}}[itemsep=-1.55mm, leftmargin=6mm]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-28pt}\n"
+    return latex_string
+
+def generate_dense_technical_skills_latex(skills: List[TechnicalSkill]) -> str:
+    if not skills: return ""
+    latex_string = "\\section*{\\LARGE \\color{myblue}Technical Skills\\xfilll[0pt]{1pt}}\n\\vspace{-12pt}\n"
+    # Note the \textbf for category and the colon
+    items = "".join([f"    \\item \\textbf{{{sanitize_and_format(skill.category)}:}} {sanitize_and_format(skill.skills)}\n" for skill in skills if skill.category or skill.skills])
+    latex_string += f"\\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-28pt}\n"
+    return latex_string
+
 # --- FastAPI App ---
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
@@ -435,6 +457,7 @@ async def generate_pdf(resume_data: ResumeData):
             "keyProjects": generate_projects_latex,
             "positionsOfResponsibility": generate_por_latex,
             "extraCurriculars": generate_extracurricular_latex,
+            "technicalSkills": generate_technical_skills_latex,
         }
 
         dense_blue_style_sections = {
@@ -443,6 +466,7 @@ async def generate_pdf(resume_data: ResumeData):
             "keyProjects": generate_dense_projects_latex,
             "positionsOfResponsibility": generate_dense_por_latex,
             "extraCurriculars": generate_dense_extracurricular_latex,
+            "technicalSkills": generate_dense_technical_skills_latex,
         }
         
         body_style_map = {

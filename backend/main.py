@@ -190,7 +190,7 @@ def generate_iitb_header_latex(details: PersonalDetails) -> str:
     Graduation & {sanitize_and_format(details.institution)} & 2027 & {sanitize_and_format(details.cpi)} \\\\ \\hline
 \\end{{tabular*}}
 
-\\vspace{{-28pt}} % Pulls the next section up
+\\vspace{{-20pt}} % Pulls the next section up
 """
 
 def generate_personal_details_latex(details: PersonalDetails) -> str:

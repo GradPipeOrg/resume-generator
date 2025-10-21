@@ -336,7 +336,7 @@ def generate_por_latex(pors: List[Responsibility]) -> str:
 \\begin{{itemize}}[itemsep=-1.55mm, leftmargin=6mm]
 {points_latex}\\end{{itemize}}
 """
-    if pors: latex_string += "\\vspace{-18pt}\n"
+    if pors: latex_string += "\\vspace{-28pt}\n"
     return latex_string
 
 def generate_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> str:
@@ -411,7 +411,7 @@ def generate_dense_por_latex(pors: List[Responsibility]) -> str:
 \\begin{{itemize}}[label=\\textcolor{{myblue}}{{\\textbullet}},itemsep = -1.55 mm, leftmargin=*]
 {points_latex}\\end{{itemize}}
 """
-    if pors: latex_string += "\\vspace{-18pt}\n"
+    if pors: latex_string += "\\vspace{-28pt}\n"
     return latex_string
 
 def generate_dense_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> str:

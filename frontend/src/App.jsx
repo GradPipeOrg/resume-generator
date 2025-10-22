@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Download, ArrowUp, ArrowDown, HelpCircle } from 'lucide-react';
+import { Download, ArrowUp, ArrowDown, HelpCircle, Eye } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import 'react-responsive-modal/styles.css'; // Import modal styles
 import { Modal } from 'react-responsive-modal';
@@ -45,25 +45,27 @@ const bodyOptions = {
   'tcolorbox_style.tex': { name: 'T-Colorbox Style' },
 };
 
+
+
 const initialData = {
   personalDetails: { 
-    name: "Adolf Hitler", 
-    branch: "Politics", 
+    name: "Trisha", 
+    branch: "Computer Science and Engineering", 
     institution: "Indian Institute of Technology Bombay", 
-    email: "hitler@nazi.de", 
-    phone: "+49 12345 67890", 
-    linkedin_url: "https://www.linkedin.com/in/adolf-hitler-1900", 
-    github_url: "https://github.com/adolf-hitler-1900", 
-    location: "Berlin, Germany", 
-    cpi: "6.9", 
-    grad_year: "1945", 
-    roll_no: "4567890", 
-    dob: "20/04/1900", 
-    gender: "Male" 
+    email: "trisha@iitb.ac.in", 
+    phone: "+91 9876543210", 
+    linkedin_url: "https://www.linkedin.com/in/trisha-1234567890", 
+    github_url: "https://github.com/trisha", 
+    location: "Mumbai, India", 
+    cpi: "9.0", 
+    grad_year: "2027", 
+    roll_no: "1234567890", 
+    dob: "25/05/2005", 
+    gender: "Female" 
   },
   scholasticAchievements: [
-    { text: "Won the 1933 election for the Chancellor of Germany" },
-    { text: "Won the 1936 election for the Chancellor of Germany" }
+    { text: "Won the 2025 election for the Chancellor of Germany" },
+    { text: "Won the 2026 election for the Chancellor of Germany" }
   ], 
   professionalExperience: [
     { company: "", role: "", dates: "", description: "", points: [""] }
@@ -125,6 +127,27 @@ function App() {
   // --- NEW STATE FOR MODAL ---
   const [openModal, setOpenModal] = useState(false);
   const [runTour, setRunTour] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState('');
+
+  // --- Start Addition ---
+const previewImageMap = {
+  'iitb_one_page.tex': '/previews/iitb_style_body.png',
+  'dense_blue.tex': '/previews/iitb_style_dense_body.png',
+  'tcolorbox_style.tex': '/previews/tcolorbox_body.png',
+};
+
+const handleShowPreview = (fileName) => {
+  const imageUrl = previewImageMap[fileName];
+  if (imageUrl) {
+    setPreviewImageUrl(imageUrl);
+    setIsPreviewModalOpen(true);
+    trackEvent('Template Preview Viewed', { template: fileName });
+  } else {
+    console.warn(`Preview image not found for template: ${fileName}`);
+  }
+};
+// --- End Addition ---
 
   useEffect(() => {
     localStorage.setItem('resumeData', JSON.stringify(resumeData));
@@ -242,19 +265,34 @@ function App() {
   <div>
     <h2 className="text-2xl font-semibold text-white mb-4">Body Style</h2>
     <div className="flex flex-wrap gap-3">
+      {/* --- Start Replacement --- */}
       {Object.entries(bodyOptions).map(([fileName, { name }]) => (
-        <button
-          key={fileName}
-          onClick={() => setBodyId(fileName)}
-          className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
-            bodyId === fileName 
-              ? 'bg-indigo-600 text-white shadow-lg' 
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-          }`}
-        >
-          {name}
-        </button>
+        <div key={fileName} className="flex items-center gap-1">
+          <button
+            onClick={() => setBodyId(fileName)}
+            className={`px-4 py-2 rounded-l-lg font-semibold transition-colors duration-200 ${
+              bodyId === fileName
+                ? 'bg-indigo-600 text-white shadow-lg'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            }`}
+          >
+            {name}
+          </button>
+          <button
+            onClick={() => handleShowPreview(fileName)}
+            className={`p-2 rounded-r-lg transition-colors duration-200 ${
+               bodyId === fileName
+                ? 'bg-indigo-700 hover:bg-indigo-800 text-white'
+                : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
+            }`}
+            data-tooltip-id="main-tooltip"
+            data-tooltip-content={`Preview ${name}`}
+          >
+            <Eye size={18} />
+          </button>
+        </div>
       ))}
+      {/* --- End Replacement --- */}
     </div>
   </div>
 </div>
@@ -396,6 +434,38 @@ function App() {
               No thanks, just download
             </a>
           </div>
+        </Modal>
+
+        {/* --- NEW: Template Preview Modal --- */}
+        <Modal
+          open={isPreviewModalOpen}
+          onClose={() => setIsPreviewModalOpen(false)}
+          center
+          classNames={{
+            modal: 'bg-slate-800 border border-slate-600 shadow-2xl p-0', // Removed padding for image fit
+            overlay: 'bg-black bg-opacity-75',
+            closeButton: 'text-white fill-current hover:text-slate-300 m-2' // Style close button
+          }}
+          styles={{
+            modal: {
+              backgroundColor: '#1e293b',
+              border: '1px solid #475569',
+              borderRadius: '0.5rem',
+              maxWidth: '80vw', // Limit width
+              maxHeight: '90vh' // Limit height
+            },
+            overlay: {
+              backgroundColor: 'rgba(0, 0, 0, 0.85)' // Darker overlay
+            }
+          }}
+        >
+          {previewImageUrl && (
+            <img
+              src={previewImageUrl}
+              alt="Template Preview"
+              className="max-w-full max-h-[85vh] object-contain rounded" // Image styling
+            />
+          )}
         </Modal>
 
       </div>

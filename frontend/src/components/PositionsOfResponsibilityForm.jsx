@@ -175,38 +175,43 @@ export const PositionsOfResponsibilityForm = ({ resumeData, setResumeData }) => 
                   />
                 )}
                 <div className="border-t border-slate-600 bg-slate-800/50 px-3 py-2 flex items-center justify-between">
+                  {/* --- Start Replacement --- */}
                   <div className="flex items-center gap-2">
-                    <button 
-                      type="button" 
-                      onClick={() => handleImprovePoint(porIndex, pointIndex)} 
-                      className="text-slate-400 hover:text-violet-400 hover:bg-slate-600 p-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed" 
+                    <button
+                      type="button"
+                      onClick={() => handleImprovePoint(porIndex, pointIndex)}
+                      className="px-2 py-1 text-xs font-semibold rounded bg-violet-600/20 text-violet-300 hover:bg-violet-600/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={isImproving === `${porIndex}-${pointIndex}`}
                       data-tooltip-id="main-tooltip"
-                      data-tooltip-content="Improve with AI"
+                      data-tooltip-content="Rewrite using STAR method and metrics"
                     >
-                      {isImproving === `${porIndex}-${pointIndex}` ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                      {isImproving === `${porIndex}-${pointIndex}` ? <Loader2 size={14} className="animate-spin inline mr-1" /> : <Sparkles size={14} className="inline mr-1" />}
+                      Enhance
                     </button>
-                    <button 
-                      type="button" 
-                      onClick={() => handleAdjustPoint(porIndex, pointIndex, 'shorten')} 
-                      className="text-slate-400 hover:text-blue-400 hover:bg-slate-600 p-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed" 
+                    <button
+                      type="button"
+                      onClick={() => handleAdjustPoint(porIndex, pointIndex, 'shorten')}
+                      className="px-2 py-1 text-xs font-semibold rounded bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={!!isImproving}
                       data-tooltip-id="main-tooltip"
-                      data-tooltip-content="Make Shorter"
+                      data-tooltip-content="Make the point more concise (110-120 chars)"
                     >
-                      <ChevronsRightLeft size={16} />
+                      <ChevronsRightLeft size={14} className="inline mr-1" />
+                      Shorter
                     </button>
-                    <button 
-                      type="button" 
-                      onClick={() => handleAdjustPoint(porIndex, pointIndex, 'lengthen')} 
-                      className="text-slate-400 hover:text-green-400 hover:bg-slate-600 p-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed" 
+                    <button
+                      type="button"
+                      onClick={() => handleAdjustPoint(porIndex, pointIndex, 'lengthen')}
+                      className="px-2 py-1 text-xs font-semibold rounded bg-green-600/20 text-green-300 hover:bg-green-600/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={!!isImproving}
                       data-tooltip-id="main-tooltip"
-                      data-tooltip-content="Make Longer"
+                      data-tooltip-content="Add detail to fill the line (110-120 chars)"
                     >
-                      <ChevronsLeftRight size={16} />
+                     <ChevronsLeftRight size={14} className="inline mr-1" />
+                      Longer
                     </button>
                   </div>
+                  {/* --- End Replacement --- */}
                   <button 
                     type="button" 
                     onClick={() => removePoint(porIndex, pointIndex)} 

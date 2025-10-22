@@ -344,10 +344,42 @@ const handleShowPreview = (fileName) => {
           );
         })}
 
-        <div className="text-center">
-          <a 
-            href="https://forms.gle/4dKgr7m7VJ2GDAwb7" 
-            target="_blank" 
+      </div>
+
+      <div className="w-1/2 bg-slate-800/50 p-8 flex flex-col items-center" id="pdf-preview">
+        <h2 className="text-2xl font-semibold text-white mb-6">Preview</h2>
+        
+        {/* --- Start Replacement --- */}
+
+        {/* Container for Side-by-Side Buttons */}
+        <div className="flex items-center justify-center gap-4 mb-2 w-full max-w-sm">
+          {/* Generate Button (Always Visible) */}
+          <button
+            onClick={handleGeneratePdf}
+            disabled={isLoading}
+            id="generate-pdf-btn"
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-base transition-transform transform hover:scale-[1.02] active:scale-95 shadow-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Generating...' : 'Generate / Refresh'}
+          </button>
+
+          {/* Download Button (Conditional) */}
+          {pdfUrl && (
+            <button
+              onClick={onOpenModal}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <Download size={20} />
+              Download
+            </button>
+          )}
+        </div>
+
+        {/* Feedback Link (Below Buttons) */}
+        <div className="text-center mb-4">
+          <a
+            href="https://forms.gle/4dKgr7m7VJ2GDAwb7"
+            target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-slate-400 hover:text-indigo-400 transition"
           >
@@ -355,32 +387,9 @@ const handleShowPreview = (fileName) => {
           </a>
         </div>
 
-        <button 
-            onClick={handleGeneratePdf} 
-            disabled={isLoading} 
-            id="generate-pdf-btn"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-[1.02] active:scale-95 shadow-lg disabled:bg-gray-600 disabled:cursor-not-allowed"
-        >
-            {isLoading ? 'Generating...' : 'Generate / Refresh Preview'}
-        </button>
-      </div>
-
-      <div className="w-1/2 bg-slate-800/50 p-8 flex flex-col items-center" id="pdf-preview">
-        <h2 className="text-2xl font-semibold text-white mb-6">Preview</h2>
-        
-        {/* The Download button now opens the modal */}
-        {pdfUrl && (
-          <button
-            onClick={onOpenModal}
-            className="mb-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 flex items-center gap-2"
-          >
-            <Download size={20} />
-            Download PDF
-          </button>
-        )}
-
         {/* The PDF viewer section */}
         <div className="w-full max-w-2xl aspect-[1/1.414] bg-slate-900/50 rounded-lg mt-4">
+        {/* --- End Replacement --- */}
           {pdfUrl ? (
             <Document file={pdfUrl} onLoadError={(error) => console.error("React-PDF Load Error:", error)}>
               <Page pageNumber={1} />

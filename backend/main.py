@@ -272,6 +272,52 @@ def generate_blank_header_latex() -> str:
     # This value can be adjusted later if the placement cell requires a different size.
     return "\\vspace*{3.5cm}\n"
 
+def generate_iitb_official_2_header(details: PersonalDetails) -> str:
+    # This generates the header using nested tabular environments for robust layout
+    # Personal Details Section (Mimicking structure of generate_iitb_header_latex)
+    personal_details_latex = f"""
+\\begin{{tabular*}}{{\\textwidth}}{{l@{{\\extracolsep{{\\fill}}}}cr}}
+    % Column 1: Logo
+    \\begin{{tabular}}[b]{{l}}
+        \\includegraphics[width=0.15\\textwidth]{{iitb_logo.png}}
+    \\end{{tabular}} &
+    % Column 2: Name, Branch, Institute, Email (Left Aligned within center block)
+    \\begin{{tabular}}[b]{{l}} % Changed alignment to 'l'
+        \\textbf{{{sanitize_and_format(details.name)}}} \\\\
+        \\textbf{{{sanitize_and_format(details.branch)}}} \\\\
+        \\textbf{{{sanitize_and_format(details.institution)}}} \\\\
+        \\textbf{{{sanitize_and_format(details.email)}}}
+    \\end{{tabular}} &
+    % Column 3: Roll No, BTech, Gender, DOB (Left Aligned within right block)
+    \\begin{{tabular}}[b]{{l}} % Changed alignment to 'l'
+        \\textbf{{{sanitize_and_format(details.roll_no)}}} \\\\
+        \\textbf{{B.Tech.}} \\\\
+        \\textbf{{Gender: {sanitize_and_format(details.gender)}}} \\\\
+        \\textbf{{DOB: {sanitize_and_format(details.dob)}}}
+    \\end{{tabular}}
+\\end{{tabular*}}
+\\vspace{{0.7cm}} % Space before the academic table line
+\\hrule % First horizontal line
+"""
+
+    # Academic Table Section (Single tabular* with aligned columns)
+    academic_table_latex = f"""
+\\vspace{{1mm}} % Space after first hrule
+\\hrule % Top horizontal line
+\\vspace{{1mm}} % Space before table
+\\hspace*{{-7mm}} % Shift table left\n\\n
+\\begin{{tabular*}}{{\\textwidth}}{{@{{\\extracolsep{{\\fill}}}} l l l c c }}
+    \\textbf{{Examination}} & \\textbf{{University}} & \\textbf{{Institute}} & \\textbf{{Year}} & \\textbf{{CPI / \\%}} \\\\
+    \\hline
+    Graduation & IIT Bombay & {sanitize_and_format(details.institution)} & {sanitize_and_format(details.grad_year)} & {sanitize_and_format(details.cpi)} \\\\
+\\end{{tabular*}}
+\\vspace{{0.1cm}} % Space before final hrule
+\\hrule % Bottom horizontal line
+\\vspace{{-5mm}} % Pulls the next section up
+"""
+
+    return personal_details_latex + academic_table_latex
+
 def generate_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
     if not achievements: return ""
     latex_string = "\\section*{\\textcolor{Blue}{\\Large{Scholastic Achievements} \\vhrulefill{1pt}}}\n\\vspace{-12pt}\n"
@@ -440,6 +486,120 @@ def generate_dense_technical_skills_latex(skills: List[TechnicalSkill]) -> str:
     latex_string += "\\vspace{-28pt}\n"
     return latex_string
 
+# --- NEW: T-Colorbox Style LaTeX Generation Functions ---
+
+def generate_tcolorbox_scholastic_latex(achievements: List[ScholasticAchievement]) -> str:
+    if not achievements: return ""
+    latex_string = "\\begin{tcolorbox}[colback=SecondBlue, coltext=black, sharp corners, boxrule=0pt, halign=center, height= .5cm, valign=top]\n"
+    latex_string += "\\vspace{-1.7mm}\n\\textbf{SCHOLASTIC ACHIEVEMENTS}\n\\end{tcolorbox}\n"
+    latex_string += "\\vspace{-5mm}\n" # REMOVED excessive negative space
+    items = "".join([f"    \\item {sanitize_and_format(ach.text)}\n" for ach in achievements])
+    latex_string += f"\\begin{{itemize}}[itemsep = -1.5mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-5mm}\n" # Reduced final spacing slightly
+    return latex_string
+
+def generate_tcolorbox_experience_latex(experiences: List[Experience]) -> str:
+    if not experiences: return ""
+    latex_string = "\\begin{tcolorbox}[colback=SecondBlue, coltext=black, sharp corners, boxrule=0pt, halign=center, height= .5cm, valign=top]\n"
+    latex_string += "\\vspace{-1.7mm}\n\\textbf{PROFESSIONAL EXPERIENCE}\n\\end{tcolorbox}\n"
+    latex_string += "\\vspace{-2mm}\n"
+    for i, exp in enumerate(experiences):
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in exp.points if point.strip()])
+        description_latex = f"\\textit{{{sanitize_and_format(exp.description)}}}" if exp.description else ""
+        
+        # --- Start replacement ---
+        latex_string += f"""
+\\vspace{{1mm}}
+\\hspace*{{-7.6mm}} % Keep negative horizontal space for alignment
+\\textbf{{{sanitize_and_format(exp.company)}}} $|$ \\textbf{{{sanitize_and_format(exp.role)}}} \\hfill{{\\small {sanitize_and_format(exp.dates)}}}
+\\vspace{{0mm}} \\hline % Adjusted space before first hline
+\\vspace{{1mm}}\\hspace*{{-5mm}} % Keep negative horizontal space
+{description_latex}
+\\vspace{{-3.5mm}} % Reduced space before itemize
+\\begin{{itemize}}[itemsep = -1.5 mm, leftmargin=*]
+{points_latex}
+\\end{{itemize}}
+\\vspace{{0mm}} \\hline % Adjusted space before second hline
+\\\\ % Use only one line break here
+"""
+        # --- End replacement ---
+    return latex_string
+
+def generate_tcolorbox_projects_latex(projects: List[Project]) -> str:
+    if not projects: return ""
+    latex_string = "\\begin{tcolorbox}[colback=SecondBlue, coltext=black, sharp corners, boxrule=0pt, halign=center, height= .5cm, valign=top]\n"
+    latex_string += "\\vspace{-1.7mm}\n\\textbf{KEY PROJECTS}\n\\end{tcolorbox}\n"
+    latex_string += "\\vspace{-2mm}\n"
+    for i, proj in enumerate(projects):
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in proj.points if point.strip()])
+        subtitle_latex = f"| \\textit{{{sanitize_and_format(proj.subtitle)}}}" if proj.subtitle else ""
+        description_latex = f"\\textit{{{sanitize_and_format(proj.description)}}}" if proj.description else ""
+        
+        # --- Start replacement ---
+        latex_string += f"""
+\\vspace{{1mm}}
+\\hspace*{{-7.5mm}} % Keep negative horizontal space
+\\textbf{{{sanitize_and_format(proj.name)}}} {subtitle_latex} \\hfill{{\\small {sanitize_and_format(proj.dates)}}}
+\\vspace{{0mm}} \\hline % Adjusted space before first hline
+\\vspace{{1mm}}
+\\hspace*{{-4.5mm}} % Keep negative horizontal space
+{description_latex}
+\\vspace{{-3.5mm}} % Reduced space before itemize
+\\begin{{itemize}}[itemsep = -1.5 mm, leftmargin=*]
+{points_latex}
+\\end{{itemize}}
+\\vspace{{0mm}} \\hline % Adjusted space before second hline
+\\\\ % Use only one line break here
+"""
+        # --- End replacement ---
+    return latex_string
+
+def generate_tcolorbox_por_latex(pors: List[Responsibility]) -> str:
+    if not pors: return ""
+    latex_string = "\\begin{tcolorbox}[colback=SecondBlue, coltext=black, sharp corners, boxrule=0pt, halign=center, height= .5cm, valign=top]\n"
+    latex_string += "\\vspace{-1.7mm}\n\\textbf{POSITION OF RESPONSIBILITY}\n\\end{tcolorbox}\n"
+    latex_string += "\\vspace{-2mm}\n"
+    for i, por in enumerate(pors):
+        points_latex = "".join([f"    \\item {sanitize_and_format(point)}\n" for point in por.points if point.strip()])
+        description_latex = f"\\textit{{{sanitize_and_format(por.description)}}}" if por.description else ""
+        
+        # --- Start replacement ---
+        latex_string += f"""
+\\vspace{{1mm}}
+\\hspace*{{-7.6mm}} % Keep negative horizontal space
+\\textbf{{{sanitize_and_format(por.role)}}} $|$ {sanitize_and_format(por.organization)} \\hfill{{\\small {sanitize_and_format(por.dates)}}}
+\\vspace{{0mm}} \\hline % Adjusted space before first hline
+\\vspace{{1mm}}\\hspace*{{-5mm}} % Keep negative horizontal space
+{description_latex}
+\\vspace{{-3.5mm}} % Reduced space before itemize
+\\begin{{itemize}}[itemsep = -1.5 mm, leftmargin=*]
+{points_latex}
+\\end{{itemize}}
+\\vspace{{0mm}} \\hline % Adjusted space before second hline
+\\\\ % Use only one line break here
+"""
+        # --- End replacement ---
+    return latex_string
+
+def generate_tcolorbox_technical_skills_latex(skills: List[TechnicalSkill]) -> str:
+    if not skills: return ""
+    latex_string = "\\begin{tcolorbox}[colback=SecondBlue, coltext=black, sharp corners, boxrule=0pt, halign=center, height= .5cm, valign=top]\n"
+    latex_string += "\\vspace{-1.7mm}\n\\textbf{TECHNICAL SKILLS}\n\\end{tcolorbox}\n"
+    latex_string += "\\vspace{-5mm}\n" # REMOVED excessive negative space
+    items = "".join([f"    \\item \\textbf{{{sanitize_and_format(skill.category)}:}} {sanitize_and_format(skill.skills)}\n" for skill in skills if skill.category or skill.skills])
+    latex_string += f"\\begin{{itemize}}[itemsep = -1.5 mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    latex_string += "\\vspace{-5mm}\n" # Kept moderate final spacing
+    return latex_string
+
+def generate_tcolorbox_extracurricular_latex(extracurriculars: List[ExtraCurricular]) -> str:
+    if not extracurriculars: return ""
+    latex_string = "\\begin{tcolorbox}[colback=SecondBlue, coltext=black, sharp corners, boxrule=0pt, halign=center, height= .5cm, valign=top]\n"
+    latex_string += "\\vspace{-1.7mm}\n\\textbf{EXTRA CURRICULAR ACTIVITIES}\n\\end{tcolorbox}\n"
+    latex_string += "\\vspace{-5.5mm}\n"
+    items = "".join([f"    \\item {sanitize_and_format(ec.text)} \\hfill{{\\small {sanitize_and_format(ec.date)}}}\n" for ec in extracurriculars if ec.text.strip()])
+    latex_string += f"\\begin{{itemize}}[itemsep = -1.5 mm, leftmargin=*]\n{items}\\end{{itemize}}\n"
+    return latex_string
+
 # --- FastAPI App ---
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
@@ -460,6 +620,7 @@ async def generate_pdf(resume_data: ResumeData):
             "iitb": generate_iitb_header_latex,
             "universal": generate_universal_header_latex,
             "blank": generate_blank_header_latex,
+            "iitb_2": generate_iitb_official_2_header,
         }
 
         universal_style_sections = {
@@ -479,10 +640,20 @@ async def generate_pdf(resume_data: ResumeData):
             "extraCurriculars": generate_dense_extracurricular_latex,
             "technicalSkills": generate_dense_technical_skills_latex,
         }
+        # Ensure this block is added
+        tcolorbox_style_sections = {
+            "scholasticAchievements": generate_tcolorbox_scholastic_latex,
+            "professionalExperience": generate_tcolorbox_experience_latex,
+            "keyProjects": generate_tcolorbox_projects_latex,
+            "positionsOfResponsibility": generate_tcolorbox_por_latex,
+            "extraCurriculars": generate_tcolorbox_extracurricular_latex,
+            "technicalSkills": generate_tcolorbox_technical_skills_latex,
+        }
         
         body_style_map = {
             "iitb_one_page.tex": universal_style_sections,
             "dense_blue.tex": dense_blue_style_sections,
+            "tcolorbox_style.tex": tcolorbox_style_sections,
         }
 
         # --- 3. Generate Header LaTeX ---
@@ -497,7 +668,12 @@ async def generate_pdf(resume_data: ResumeData):
             # Default to universal style if the body_id is not explicitly mapped
             section_generators = universal_style_sections
 
+        # --- Start replacement ---
         dynamic_content = ""
+        # Add initial space ONLY for tcolorbox style to prevent header overlap
+        if body_id == "tcolorbox_style.tex":
+            dynamic_content += "\\vspace{5mm}\n" # Adjust this value as needed
+
         for section_key in resume_data.sectionOrder:
             generator_func = section_generators.get(section_key)
             if generator_func:
@@ -506,6 +682,7 @@ async def generate_pdf(resume_data: ResumeData):
                     section_latex = generator_func(section_data)
                     if section_latex:
                         dynamic_content += section_latex + "\n"
+        # --- End replacement ---
         
         # --- 5. Populate Template and Compile PDF ---
         latex_template = latex_template.replace("__PERSONAL_DETAILS_SECTION__", header_latex)

@@ -29,6 +29,10 @@ const headerOptions = {
     name: 'IITB Official',
     headerFields: ['name', 'branch', 'roll_no', 'cpi', 'dob', 'gender']
   },
+  'iitb_2': {
+    name: 'IITB Official - 2',
+    headerFields: ['name', 'branch', 'institution', 'email', 'roll_no', 'dob', 'gender', 'grad_year', 'cpi']
+  },
   'blank': {
     name: 'Placement Cell (Blank)',
     headerFields: []
@@ -38,6 +42,7 @@ const headerOptions = {
 const bodyOptions = {
   'iitb_one_page.tex': { name: 'IITB Style' },
   'dense_blue.tex': { name: 'IITB Style(Dense)' },
+  'tcolorbox_style.tex': { name: 'T-Colorbox Style' },
 };
 
 const initialData = {

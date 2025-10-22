@@ -1,0 +1,39 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[a4paper, top = 10mm, bottom = 6.4mm,left = 14.11mm,right = 14.11mm]{geometry}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{enumitem,xcolor}
+\usepackage{wrapfig}
+\usepackage{microtype}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage{textcomp}
+\usepackage[most]{tcolorbox}
+\usepackage[colorlinks=false]{hyperref}
+\usepackage{verbatim}
+\usepackage{fontawesome5} % Added for compatibility with other headers
+
+% --- Custom Styling from new template ---
+\definecolor{MyBlue}{rgb}{0.25,0.5,0.75}
+\colorlet{NextBlue}{MyBlue!20}
+\colorlet{SecondBlue}{MyBlue!40}
+\newcommand{\xfilll}[2][1ex]{
+\dimen0=#2\advance\dimen0 by #1
+\leaders\hrule height \dimen0 depth -#1\hfill}
+\titleformat{\section}{\large\scshape\raggedright}{}{0em}{}
+\renewcommand\labelitemi{\raisebox{0.4ex}{\tiny$\bullet$}}
+\renewcommand{\labelitemii}{$\cdot$}
+\renewcommand{\labelitemii}{$\circ$}
+\pagenumbering{gobble}
+% --- End of Custom Styling ---
+
+\begin{document}
+
+__PERSONAL_DETAILS_SECTION__
+
+__DYNAMIC_CONTENT_SECTION__
+
+\end{document}

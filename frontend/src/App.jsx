@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Download, ArrowUp, ArrowDown, HelpCircle, Eye } from 'lucide-react';
+import { Download, ArrowUp, ArrowDown, HelpCircle, Eye, Info } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import 'react-responsive-modal/styles.css'; // Import modal styles
 import { Modal } from 'react-responsive-modal';
@@ -264,11 +264,12 @@ const handleShowPreview = (fileName) => {
             <h1 className="text-4xl font-bold tracking-tighter text-white">Apex - The IITB Resume Generator</h1>
             <button 
               onClick={() => setIsWaitlistModalOpen(true)}
-              className="text-lg font-normal text-slate-400 hover:text-indigo-400 transition -mt-1 self-center"
+              className="inline-flex items-center gap-1.5 text-lg font-normal text-slate-400 hover:text-indigo-400 hover:underline transition -mt-1 self-center" 
               data-tooltip-id="main-tooltip" 
               data-tooltip-content="About GradPipe"
             >
               by GradPipe
+              <Info size={14} />
             </button>
           </div>
 

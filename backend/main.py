@@ -126,6 +126,9 @@ class ResumeData(BaseModel):
 class FunnelSubmitData(BaseModel):
     resumeData: dict
 
+class WaitlistEntry(BaseModel):
+    email: str
+
 def sanitize_and_format(text: str) -> str:
     # This function handles both sanitization and Markdown-style bolding.
     
@@ -763,3 +766,25 @@ async def funnel_submit(data: FunnelSubmitData):
     except Exception as e:
         print(f"--- FUNNEL SUBMIT EXCEPTION ---: {e}")
         raise HTTPException(status_code=500, detail="Could not submit profile.")
+
+@app.post("/waitlist/submit")
+async def waitlist_submit(data: WaitlistEntry):
+    try:
+        WAITLIST_SHEET_MONKEY_URL = "https://api.sheetmonkey.io/form/9wGJC18fMvLCEjLvXQqhgB" 
+
+        if "YOUR_NEW_WAITLIST_FORM_URL" in WAITLIST_SHEET_MONKEY_URL:
+            print("--- WARNING: Waitlist Sheet Monkey URL not set! ---")
+            raise HTTPException(status_code=500, detail="Waitlist URL not configured.")
+
+        payload = {
+            "Email": data.email,
+            "SubmittedAt": "x-sheetmonkey-current-date-time" # Automatically adds a timestamp
+        }
+
+        response = requests.post(WAITLIST_SHEET_MONKEY_URL, json=payload)
+        response.raise_for_status() 
+
+        return {"status": "success"}
+    except Exception as e:
+        print(f"--- WAITLIST SUBMIT EXCEPTION ---: {e}")
+        raise HTTPException(status_code=500, detail="Could not submit email to waitlist.")

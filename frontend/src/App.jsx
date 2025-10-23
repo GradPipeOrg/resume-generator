@@ -575,7 +575,7 @@ const handleShowPreview = (fileName) => {
           <div className="p-6 text-center space-y-4">
             <h2 className="text-2xl font-bold text-white">Stop Applying. Get Discovered.</h2>
             <p className="text-slate-300">
-              Apex is a free tool built by GradPipe. Our real mission isn't just to build resumes, it's to get you get you hired.
+              Apex is a free tool built by GradPipe. Our real mission isn't just to build resumes, it's to get you hired.
               We're building an exclusive talent pool to connect top students (like you) directly with global companies and startups.
             </p>
 

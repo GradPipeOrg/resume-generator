@@ -129,6 +129,10 @@ function App() {
   const [runTour, setRunTour] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImageUrl, setPreviewImageUrl] = useState('');
+  
+  // --- NEW STATE FOR WAITLIST MODAL ---
+  const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
+  const [waitlistEmail, setWaitlistEmail] = useState('');
 
   // --- Start Addition ---
 const previewImageMap = {
@@ -226,6 +230,27 @@ const handleShowPreview = (fileName) => {
     }
   };
 
+  const handleWaitlistSubmit = async (e) => {
+    e.preventDefault();
+    if (!waitlistEmail) {
+      alert("Please enter your email.");
+      return;
+    }
+    trackEvent('Waitlist Joined');
+    setIsLoading(true); // Reuse existing loading state
+    try {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/waitlist/submit`, { email: waitlistEmail });
+      alert("Success! You've been added to the waitlist.");
+      setIsWaitlistModalOpen(false); // Close modal on success
+      setWaitlistEmail(''); // Clear email
+    } catch (error) {
+      console.error("Waitlist submission failed:", error);
+      alert("Sorry, there was an error submitting your email.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // --- Functions to control the modal ---
   const onOpenModal = () => setOpenModal(true);
   const onCloseModal = () => setOpenModal(false);
@@ -233,9 +258,27 @@ const handleShowPreview = (fileName) => {
   return (
     <div className="flex h-screen">
       <div className="w-1/2 bg-slate-900 p-8 overflow-y-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-bold tracking-tighter text-white">Resume Generator</h1>
-          <button onClick={() => setRunTour(true)} className="flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition" data-tooltip-id="main-tooltip" data-tooltip-content="Start Tour">
+        <div className="flex items-start justify-between" id="main-header">
+          {/* LEFT SIDE: Title and new "by GradPipe" button */}
+          <div className="flex flex-col"> {/* <-- 1. ADDED flex flex-col */}
+            <h1 className="text-4xl font-bold tracking-tighter text-white">Apex - The IITB Resume Generator</h1>
+            <button 
+              onClick={() => setIsWaitlistModalOpen(true)}
+              className="text-lg font-normal text-slate-400 hover:text-indigo-400 transition -mt-1 self-center"
+              data-tooltip-id="main-tooltip" 
+              data-tooltip-content="About GradPipe"
+            >
+              by GradPipe
+            </button>
+          </div>
+
+          {/* RIGHT SIDE: Tour button STAYS HERE */}
+          <button 
+            onClick={() => setRunTour(true)} 
+            className="flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition mt-2" 
+            data-tooltip-id="main-tooltip" 
+            data-tooltip-content="Start Tour"
+          >
             <HelpCircle size={20} />
             <span>How to Use</span>
           </button>
@@ -343,6 +386,36 @@ const handleShowPreview = (fileName) => {
             </div>
           );
         })}
+
+        {/* --- NEW: App Footer --- */}
+        <footer className="mt-12 pt-6 border-t border-slate-700 text-center space-y-4">
+          <div className="flex items-center justify-center gap-6">
+            <a 
+              href="https://www.linkedin.com/company/gradpipe" // <<< UPDATE THIS LINK
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-slate-400 hover:text-indigo-400 transition"
+              data-tooltip-id="main-tooltip" 
+              data-tooltip-content="GradPipe on LinkedIn"
+            >
+              LinkedIn
+            </a>
+            <a 
+              href="https://www.instagram.com/gradpipe" // <<< UPDATE THIS LINK
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-slate-400 hover:text-indigo-400 transition"
+              data-tooltip-id="main-tooltip" 
+              data-tooltip-content="GradPipe on Instagram"
+            >
+              Instagram
+            </a>
+          </div>
+          <p className="text-sm text-slate-500">
+            © 2025 GradPipe. All rights reserved.
+          </p>
+        </footer>
+        {/* --- End of App Footer --- */}
 
       </div>
 
@@ -475,6 +548,55 @@ const handleShowPreview = (fileName) => {
               className="max-w-full max-h-[85vh] object-contain rounded" // Image styling
             />
           )}
+        </Modal>
+
+        {/* --- NEW: Waitlist (Passive Funnel) Modal --- */}
+        <Modal 
+          open={isWaitlistModalOpen} 
+          onClose={() => setIsWaitlistModalOpen(false)} 
+          center 
+          classNames={{ 
+            modal: 'bg-slate-800 border border-slate-600 shadow-2xl text-white',
+            overlay: 'bg-black bg-opacity-75'
+          }}
+          styles={{
+            modal: {
+              backgroundColor: '#1e293b',
+              border: '1px solid #475569',
+              borderRadius: '0.5rem',
+              color: 'white',
+              maxWidth: '500px'
+            },
+            overlay: {
+              backgroundColor: 'rgba(0, 0, 0, 0.75)'
+            }
+          }}
+        >
+          <div className="p-6 text-center space-y-4">
+            <h2 className="text-2xl font-bold text-white">Stop Applying. Get Discovered.</h2>
+            <p className="text-slate-300">
+              Apex is a free tool built by GradPipe. Our real mission isn't just to build resumes—it's to get you hired.
+              We're building an exclusive talent pool to connect top students (like you) directly with global companies.
+            </p>
+
+            <form onSubmit={handleWaitlistSubmit} className="space-y-4 pt-2">
+              <input
+                type="email"
+                value={waitlistEmail}
+                onChange={(e) => setWaitlistEmail(e.target.value)}
+                placeholder="Enter your email to join the waitlist"
+                className="input-style w-full"
+                required
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-5 rounded-lg transition disabled:opacity-50"
+              >
+                {isLoading ? "Submitting..." : "Join the Waitlist"}
+              </button>
+            </form>
+          </div>
         </Modal>
 
       </div>

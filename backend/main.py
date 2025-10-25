@@ -718,8 +718,22 @@ async def lengthen_text(request: AdjustTextRequest):
         if not request.text.strip(): raise HTTPException(status_code=400, detail="Text cannot be empty")
         prompt = generate_lengthen_prompt(request.text)
         response = model.generate_content(prompt)
+        
+        # This line will raise a ValueError if parts are empty
         adjusted_text = response.text.strip().replace('**', '').replace('\n', ' ')
         return {"adjusted_text": adjusted_text}
+    
+    except ValueError as ve:
+        print(f"--- AI VALUE_ERROR (Likely Safety Block in /lengthen_text) ---: {ve}")
+        try:
+            finish_reason = response.candidates[0].finish_reason
+            print(f"--- Actual Finish Reason: {finish_reason} ---")
+            if finish_reason == 3: # SAFETY
+                 raise HTTPException(status_code=400, detail="Request blocked by AI safety filters. Please rephrase your input.")
+        except Exception:
+            pass 
+        raise HTTPException(status_code=500, detail="AI response was empty. This can be caused by safety filters or an internal AI error.")
+    
     except Exception as e:
         print("--- AI LENGthen EXCEPTION ---"); traceback.print_exc(); print("-------------------------")
         raise HTTPException(status_code=500, detail=f"An error occurred with the AI model: {str(e)}")
@@ -730,8 +744,22 @@ async def shorten_text(request: AdjustTextRequest):
         if not request.text.strip(): raise HTTPException(status_code=400, detail="Text cannot be empty")
         prompt = generate_shorten_prompt(request.text)
         response = model.generate_content(prompt)
+        
+        # This line will raise a ValueError if parts are empty
         adjusted_text = response.text.strip().replace('**', '').replace('\n', ' ')
         return {"adjusted_text": adjusted_text}
+
+    except ValueError as ve:
+        print(f"--- AI VALUE_ERROR (Likely Safety Block in /shorten_text) ---: {ve}")
+        try:
+            finish_reason = response.candidates[0].finish_reason
+            print(f"--- Actual Finish Reason: {finish_reason} ---")
+            if finish_reason == 3: # SAFETY
+                 raise HTTPException(status_code=400, detail="Request blocked by AI safety filters. Please rephrase your input.")
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail="AI response was empty. This can be caused by safety filters or an internal AI error.")
+    
     except Exception as e:
         print("--- AI SHORTEN EXCEPTION ---"); traceback.print_exc(); print("-------------------------")
         raise HTTPException(status_code=500, detail=f"An error occurred with the AI model: {str(e)}")
@@ -742,8 +770,24 @@ async def improve_text(request: ImproveTextRequest):
         if not request.text.strip(): raise HTTPException(status_code=400, detail="Text cannot be empty")
         prompt = generate_ai_prompt(request.text)
         response = model.generate_content(prompt)
+        
+        # This line will raise a ValueError if parts are empty (e.g., safety block)
         improved_text = response.text.strip().replace('**', '').replace('\n', ' ')
+        
         return {"improved_text": improved_text}
+    
+    except ValueError as ve:
+        print(f"--- AI VALUE_ERROR (Likely Safety Block in /improve_text) ---: {ve}")
+        # Try to get the real finish reason
+        try:
+            finish_reason = response.candidates[0].finish_reason
+            print(f"--- Actual Finish Reason: {finish_reason} ---")
+            if finish_reason == 3: # SAFETY
+                 raise HTTPException(status_code=400, detail="Request blocked by AI safety filters. Please rephrase your input.")
+        except Exception:
+            pass # Fallback to generic error
+        raise HTTPException(status_code=500, detail="AI response was empty. This can be caused by safety filters or an internal AI error.")
+
     except Exception as e:
         print("--- AI ENDPOINT EXCEPTION OCCURRED ---"); traceback.print_exc(); print("------------------------------------")
         raise HTTPException(status_code=500, detail=f"An error occurred with the AI model: {str(e)}")
